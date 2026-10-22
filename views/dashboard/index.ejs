@@ -1,0 +1,194 @@
+<%- include('../partials/head', { extraCss: ['/css/dashboard.css'] }) %>
+<body>
+<div class="app-wrapper">
+  <%- include('../partials/sidebar') %>
+  <%- include('../partials/mobile-nav') %>
+
+  <main class="main-content">
+    <%- include('../partials/flash') %>
+
+    <%
+      const now = new Date();
+      const hour = now.getHours();
+      let greeting = 'Good morning';
+      if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
+      else if (hour >= 17) greeting = 'Good evening';
+      const firstName = user.full_name ? user.full_name.split(' ')[0] : user.username;
+      const dateStr = now.toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    %>
+
+    <!-- Welcome header -->
+    <div class="welcome-header">
+      <div class="greeting"><%= greeting %>, <span><%= firstName %></span> 👋</div>
+      <div class="date-line"><%= dateStr %> · BHOS Computer Engineering Class of 2025</div>
+    </div>
+
+    <!-- Pending account warning -->
+    <% if (user.status === 'pending') { %>
+      <div class="pending-banner">
+        <span class="banner-icon">⏳</span>
+        <div>
+          <div class="banner-title">Account Pending Approval</div>
+          <div class="banner-text">
+            Your account is awaiting administrator review. You will receive full access once approved.
+            Please check back later or contact a system administrator.
+          </div>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Admin quick overview -->
+    <% if (user.role === 'admin') { %>
+      <p class="section-heading">Admin Overview</p>
+      <div class="admin-overview" style="margin-bottom:2rem">
+        <div class="admin-mini-card">
+          <span class="mini-icon">👥</span>
+          <div>
+            <div class="mini-val"><%= totalUsers %></div>
+            <div class="mini-lbl">Total Members</div>
+          </div>
+        </div>
+        <div class="admin-mini-card" style="border-color: <%= pendingCount > 0 ? 'rgba(214,137,16,0.4)' : 'var(--border)' %>">
+          <span class="mini-icon">⏳</span>
+          <div>
+            <div class="mini-val" style="color: <%= pendingCount > 0 ? 'var(--warning)' : 'var(--text-heading)' %>"><%= pendingCount %></div>
+            <div class="mini-lbl">Pending Approvals</div>
+          </div>
+        </div>
+        <div class="admin-mini-card">
+          <span class="mini-icon">🏛</span>
+          <div>
+            <div class="mini-val"><%= totalSubjectsCount %></div>
+            <div class="mini-lbl">Active Subjects</div>
+          </div>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Stats row -->
+    <p class="section-heading">Workspace Overview</p>
+    <div class="stats-row">
+      <a href="/materials?uploader_id=<%= user.id %>" class="stat-card" style="text-decoration:none;color:inherit">
+        <div class="stat-icon">📁</div>
+        <div class="stat-value"><%= userUploadsCount %></div>
+        <div class="stat-label">Your Uploads</div>
+      </a>
+      <a href="/assignments" class="stat-card" style="text-decoration:none;color:inherit">
+        <div class="stat-icon">📝</div>
+        <div class="stat-value"><%= totalAssignmentsCount %></div>
+        <div class="stat-label">Assignments</div>
+      </a>
+      <a href="/bookmarks" class="stat-card" style="text-decoration:none;color:inherit">
+        <div class="stat-icon">🔖</div>
+        <div class="stat-value"><%= userBookmarksCount %></div>
+        <div class="stat-label">Bookmarks</div>
+      </a>
+      <a href="/subjects" class="stat-card" style="text-decoration:none;color:inherit">
+        <div class="stat-icon">🏛</div>
+        <div class="stat-value"><%= totalSubjectsCount %></div>
+        <div class="stat-label">Subjects</div>
+      </a>
+    </div>
+
+    <!-- Quick actions -->
+    <p class="section-heading">Quick Actions</p>
+    <div class="quick-actions" style="margin-bottom:2rem">
+      <a href="/materials/upload" class="action-card">
+        <span class="action-icon">⬆</span>
+        <span class="action-label">Upload Material</span>
+      </a>
+      <a href="/subjects" class="action-card">
+        <span class="action-icon">🏛</span>
+        <span class="action-label">Browse Subjects</span>
+      </a>
+      <a href="/assignments" class="action-card">
+        <span class="action-icon">📝</span>
+        <span class="action-label">View Assignments</span>
+      </a>
+      <a href="/bookmarks" class="action-card">
+        <span class="action-icon">🔖</span>
+        <span class="action-label">My Bookmarks</span>
+      </a>
+      <a href="/profile" class="action-card">
+        <span class="action-icon">👤</span>
+        <span class="action-label">My Profile</span>
+      </a>
+      <% if (user.role === 'admin') { %>
+        <a href="/admin" class="action-card action-card-admin">
+          <span class="action-icon">⚙</span>
+          <span class="action-label">Admin Panel</span>
+        </a>
+      <% } %>
+    </div>
+
+    <!-- Recent Feeds (Two columns) -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:1.5rem">
+      <!-- Recent Materials -->
+      <div class="card">
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+          <h3>📚 Recent Materials</h3>
+          <a href="/materials" class="btn btn-ghost btn-sm">View All →</a>
+        </div>
+        <% if (recentMaterials && recentMaterials.length > 0) { %>
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            <% recentMaterials.forEach(m => { %>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:var(--radius)">
+                <div style="min-width:0;flex:1;margin-right:0.75rem">
+                  <a href="/materials/<%= m.id %>" style="color:var(--text-heading);font-weight:500;text-decoration:none;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    <%= m.title %>
+                  </a>
+                  <div style="font-size:0.75rem;color:var(--text-muted);display:flex;gap:0.5rem;align-items:center;margin-top:0.2rem">
+                    <span class="badge badge-student" style="font-size:0.7rem;padding:0.15rem 0.4rem"><%= m.category %></span>
+                    <span><%= m.subject_code || m.subject_name %></span>
+                  </div>
+                </div>
+                <span class="badge badge-outline" style="font-size:0.75rem;text-transform:uppercase"><%= m.file_type %></span>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <p style="color:var(--text-muted);font-size:0.875rem;margin:0">No materials uploaded yet. Be the first to <a href="/materials/upload" style="color:var(--accent-light)">upload one</a>!</p>
+        <% } %>
+      </div>
+
+      <!-- Recent Assignments -->
+      <div class="card">
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+          <h3>📝 Active Assignments</h3>
+          <a href="/assignments" class="btn btn-ghost btn-sm">View All →</a>
+        </div>
+        <% if (recentAssignments && recentAssignments.length > 0) { %>
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            <% recentAssignments.forEach(a => { %>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:var(--radius)">
+                <div style="min-width:0;flex:1;margin-right:0.75rem">
+                  <a href="/assignments/<%= a.id %>" style="color:var(--text-heading);font-weight:500;text-decoration:none;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    <%= a.title %>
+                  </a>
+                  <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem">
+                    <%= a.subject_code || a.subject_name %> · <%= a.solutions_count %> solution<%= a.solutions_count === 1 ? '' : 's' %>
+                  </div>
+                </div>
+                <% if (a.deadline) { %>
+                  <span class="badge badge-<%= a.deadline >= Math.floor(Date.now()/1000) ? 'approved' : 'suspended' %>" style="font-size:0.75rem">
+                    <%= new Date(a.deadline * 1000).toLocaleDateString('en-GB') %>
+                  </span>
+                <% } else { %>
+                  <span class="badge badge-student" style="font-size:0.75rem">No deadline</span>
+                <% } %>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <p style="color:var(--text-muted);font-size:0.875rem;margin:0">No active assignments right now. <a href="/assignments/new" style="color:var(--accent-light)">Create an assignment</a>.</p>
+        <% } %>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="/js/sidebar.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

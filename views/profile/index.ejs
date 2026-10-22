@@ -1,0 +1,120 @@
+<%- include('../partials/head') %>
+<body>
+<div class="app-wrapper">
+  <%- include('../partials/sidebar') %>
+  <%- include('../partials/mobile-nav') %>
+
+  <main class="main-content">
+    <%- include('../partials/flash') %>
+
+    <div class="page-header">
+      <h1>My Profile</h1>
+      <p>Manage your personal information and account details.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:300px 1fr;gap:1.5rem;align-items:start">
+
+      <!-- Profile card -->
+      <div class="card" style="text-align:center">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0.75rem">
+          <div class="avatar avatar-xl">
+            <% if (profileUser.avatar_url) { %>
+              <img src="<%= profileUser.avatar_url %>" alt="<%= profileUser.full_name %>">
+            <% } else { %>
+              <%= profileUser.full_name ? profileUser.full_name.charAt(0).toUpperCase() : '?' %>
+            <% } %>
+          </div>
+
+          <div>
+            <h2 style="font-size:1.1rem;margin-bottom:0.25rem"><%= profileUser.full_name %></h2>
+            <span style="color:var(--text-muted);font-size:0.85rem">@<%= profileUser.username %></span>
+          </div>
+
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center">
+            <span class="badge badge-<%= profileUser.role %>"><%= profileUser.role %></span>
+            <span class="badge badge-<%= profileUser.status %>"><%= profileUser.status %></span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div style="text-align:left;font-size:0.875rem">
+          <div style="margin-bottom:0.6rem">
+            <span style="color:var(--text-muted)">Student Code</span><br>
+            <strong><%= profileUser.student_code %></strong>
+          </div>
+          <div style="margin-bottom:0.6rem">
+            <span style="color:var(--text-muted)">Email</span><br>
+            <strong><%= profileUser.email %></strong>
+          </div>
+          <div style="margin-bottom:0.6rem">
+            <span style="color:var(--text-muted)">Member Since</span><br>
+            <strong><%= new Date(profileUser.created_at * 1000).toLocaleDateString('en-GB', { year:'numeric', month:'long', day:'numeric' }) %></strong>
+          </div>
+          <% if (profileUser.last_login) { %>
+          <div>
+            <span style="color:var(--text-muted)">Last Login</span><br>
+            <strong><%= new Date(profileUser.last_login * 1000).toLocaleDateString('en-GB', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) %></strong>
+          </div>
+          <% } %>
+        </div>
+
+        <% if (profileUser.bio) { %>
+          <div class="divider"></div>
+          <p style="font-size:0.875rem;color:var(--text-secondary);text-align:left;margin:0"><%= profileUser.bio %></p>
+        <% } %>
+      </div>
+
+      <!-- Edit profile form -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Edit Profile</h3>
+        </div>
+
+        <form method="POST" action="/profile/update">
+          <div class="form-group">
+            <label class="form-label" for="full_name">Full Name</label>
+            <input class="form-control" type="text" id="full_name" name="full_name"
+              value="<%= profileUser.full_name %>" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input class="form-control" type="email" id="email" name="email"
+              value="<%= profileUser.email %>" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="bio">Bio</label>
+            <textarea class="form-control" id="bio" name="bio"
+              placeholder="Tell something about yourself..." rows="4"><%= profileUser.bio || '' %></textarea>
+          </div>
+
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="/profile" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+
+        <div class="divider"></div>
+
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+          <a href="/settings" class="btn btn-secondary btn-sm">⚙ Account Settings</a>
+          <a href="/settings" class="btn btn-ghost btn-sm">🔑 Change Password</a>
+        </div>
+      </div>
+
+    </div><!-- /grid -->
+  </main>
+</div>
+
+<style>
+  @media (max-width: 768px) {
+    .profile-grid { grid-template-columns: 1fr !important; }
+  }
+</style>
+
+<script src="/js/sidebar.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

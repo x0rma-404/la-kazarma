@@ -1,0 +1,167 @@
+/* ═══════════════════════════════════════════════════════════════════
+   La Kazarma – Auth Pages CSS
+═══════════════════════════════════════════════════════════════════ */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-main);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      rgba(107,124,62,0.03) 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 39px,
+      rgba(107,124,62,0.03) 40px
+    );
+  padding: 2rem 1rem;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 440px;
+}
+
+/* ── Emblem / Logo ──────────────────────────────────────────────── */
+.auth-emblem {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-emblem-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: var(--accent-dim);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.auth-emblem-icon::before,
+.auth-emblem-icon::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(107,124,62,0.25);
+}
+.auth-emblem-icon::after {
+  inset: -10px;
+  border-color: rgba(107,124,62,0.1);
+}
+
+.auth-emblem h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.auth-emblem .auth-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  margin-top: 0.35rem;
+}
+
+/* ── Card ───────────────────────────────────────────────────────── */
+.auth-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light), var(--accent));
+}
+
+.auth-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-heading);
+  margin-bottom: 0.25rem;
+}
+.auth-card-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+/* ── Focus glow on inputs ───────────────────────────────────────── */
+.auth-card .form-control:focus {
+  border-color: var(--accent-light);
+  box-shadow: 0 0 0 3px rgba(138,156,80,0.2),
+              0 0 12px rgba(107,124,62,0.15);
+}
+
+/* ── Password strength ──────────────────────────────────────────── */
+.password-strength {
+  margin-top: 0.4rem;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.password-strength-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.strength-weak   { width: 25%; background: var(--danger); }
+.strength-fair   { width: 50%; background: var(--warning); }
+.strength-good   { width: 75%; background: var(--info); }
+.strength-strong { width: 100%; background: var(--success); }
+.strength-label  { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+/* ── Auth links ─────────────────────────────────────────────────── */
+.auth-links {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.auth-links a { color: var(--accent-light); font-weight: 500; }
+.auth-links a:hover { color: var(--text-heading); }
+
+.auth-divider {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin: 1.25rem 0;
+  color: var(--text-muted); font-size: 0.8rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ── Restricted notice ──────────────────────────────────────────── */
+.auth-notice {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.auth-notice::before { content: '🔒 '; }

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1c1f17" />
+      <stop offset="100%" stop-color="#0c0d0a" />
+    </linearGradient>
+    <linearGradient id="bladeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="50%" stop-color="#d6dad0" />
+      <stop offset="100%" stop-color="#9aa092" />
+    </linearGradient>
+    <linearGradient id="bladeGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="50%" stop-color="#d6dad0" />
+      <stop offset="100%" stop-color="#9aa092" />
+    </linearGradient>
+    <linearGradient id="oliveGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a4b868" />
+      <stop offset="100%" stop-color="#6b7c3e" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background tactical rounded badge -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bgGrad)" stroke="#6b7c3e" stroke-width="2.5" />
+  <rect x="5" y="5" width="54" height="54" rx="11" fill="none" stroke="#252a1d" stroke-width="1.5" />
+
+  <!-- SWORD 1: Bottom-Left to Top-Right -->
+  <g transform="rotate(45 32 32)">
+    <!-- Blade -->
+    <path d="M 32 6 L 34.5 12 L 33.5 40 L 30.5 40 L 29.5 12 Z" fill="url(#bladeGrad1)" stroke="#52584a" stroke-width="0.5" />
+    <!-- Blade center fuller line -->
+    <line x1="32" y1="10" x2="32" y2="38" stroke="#7a8270" stroke-width="0.8" />
+    <!-- Guard -->
+    <rect x="24" y="40" width="16" height="3.5" rx="1.5" fill="url(#oliveGold)" stroke="#3f4924" stroke-width="0.5" />
+    <!-- Grip -->
+    <rect x="30.2" y="43.5" width="3.6" height="10" rx="1" fill="#1b1d18" stroke="#4a523c" stroke-width="0.6" />
+    <!-- Pommel -->
+    <circle cx="32" cy="55.5" r="2.8" fill="url(#oliveGold)" stroke="#3f4924" stroke-width="0.6" />
+  </g>
+
+  <!-- SWORD 2: Bottom-Right to Top-Left -->
+  <g transform="rotate(-45 32 32)">
+    <!-- Blade -->
+    <path d="M 32 6 L 34.5 12 L 33.5 40 L 30.5 40 L 29.5 12 Z" fill="url(#bladeGrad2)" stroke="#52584a" stroke-width="0.5" />
+    <!-- Blade center fuller line -->
+    <line x1="32" y1="10" x2="32" y2="38" stroke="#7a8270" stroke-width="0.8" />
+    <!-- Guard -->
+    <rect x="24" y="40" width="16" height="3.5" rx="1.5" fill="url(#oliveGold)" stroke="#3f4924" stroke-width="0.5" />
+    <!-- Grip -->
+    <rect x="30.2" y="43.5" width="3.6" height="10" rx="1" fill="#1b1d18" stroke="#4a523c" stroke-width="0.6" />
+    <!-- Pommel -->
+    <circle cx="32" cy="55.5" r="2.8" fill="url(#oliveGold)" stroke="#3f4924" stroke-width="0.6" />
+  </g>
+
+  <!-- Center Boss Shield / Emblem -->
+  <circle cx="32" cy="32" r="4.2" fill="#141710" stroke="#a4b868" stroke-width="1.5" />
+  <circle cx="32" cy="32" r="1.8" fill="#a4b868" />
+</svg>
+

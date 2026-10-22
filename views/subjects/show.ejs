@@ -1,0 +1,387 @@
+<%- include('../partials/head') %>
+<body>
+<div class="app-wrapper">
+  <%- include('../partials/sidebar') %>
+  <%- include('../partials/mobile-nav') %>
+
+  <main class="main-content">
+    <%- include('../partials/flash') %>
+
+    <!-- Back button & actions -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem">
+      <a href="/subjects" class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:0.4rem">
+        ← Back to Subjects
+      </a>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+        <a href="/materials/upload?subject_id=<%= subject.id %>" class="btn btn-primary btn-sm">
+          + Upload Material
+        </a>
+        <a href="/assignments/new?subject_id=<%= subject.id %>" class="btn btn-secondary btn-sm">
+          + Create Assignment
+        </a>
+        <% if (isAdmin) { %>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('edit-subject-modal').classList.remove('hidden')">
+            ⚙ Edit
+          </button>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Subject Hero Header -->
+    <div class="card" style="margin-bottom:1.5rem;background:linear-gradient(180deg, rgba(107,124,62,0.12) 0%, rgba(20,20,20,0.6) 100%);border-color:rgba(107,124,62,0.3)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem">
+        <div>
+          <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem">
+            <% if (subject.code) { %>
+              <span class="badge badge-admin" style="font-size:0.8rem;letter-spacing:0.05em"><%= subject.code %></span>
+            <% } %>
+            <span class="badge badge-student" style="font-size:0.8rem"><%= subject.semester %> · <%= subject.academic_year %></span>
+            <% if (subject.is_archived) { %>
+              <span class="badge badge-suspended" style="font-size:0.8rem">Archived</span>
+            <% } %>
+          </div>
+          <h1 style="font-size:1.8rem;margin:0 0 0.5rem;color:#ffffff"><%= subject.name %></h1>
+          <p style="color:var(--text-secondary);font-size:0.95rem;max-width:750px;line-height:1.6;margin:0">
+            <%= subject.description || 'No detailed syllabus description provided.' %>
+          </p>
+        </div>
+
+        <div style="display:flex;gap:1.5rem;background:rgba(0,0,0,0.3);padding:0.8rem 1.2rem;border-radius:var(--radius);border:1px solid var(--border)">
+          <div style="text-align:center">
+            <div style="font-size:1.4rem;font-weight:700;color:var(--accent-light)"><%= topics.length %></div>
+            <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase">Topics</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:1.4rem;font-weight:700;color:var(--text-heading)"><%= materials.length %></div>
+            <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase">Files</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:1.4rem;font-weight:700;color:var(--text-heading)"><%= assignments.length %></div>
+            <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase">Tasks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div style="display:flex;gap:0.5rem;border-bottom:1px solid var(--border);margin-bottom:1.5rem;overflow-x:auto">
+      <button class="btn btn-ghost <%= activeTab === 'overview' ? 'active' : '' %>" data-tab="overview"
+        style="border-radius:0;border-bottom:2px solid <%= activeTab === 'overview' ? 'var(--accent)' : 'transparent' %>;padding:0.75rem 1rem">
+        📖 Syllabus & Topics (<%= topics.length %>)
+      </button>
+      <button class="btn btn-ghost <%= activeTab === 'materials' ? 'active' : '' %>" data-tab="materials"
+        style="border-radius:0;border-bottom:2px solid <%= activeTab === 'materials' ? 'var(--accent)' : 'transparent' %>;padding:0.75rem 1rem">
+        📚 Study Materials (<%= materials.length %>)
+      </button>
+      <button class="btn btn-ghost <%= activeTab === 'assignments' ? 'active' : '' %>" data-tab="assignments"
+        style="border-radius:0;border-bottom:2px solid <%= activeTab === 'assignments' ? 'var(--accent)' : 'transparent' %>;padding:0.75rem 1rem">
+        📝 Assignments (<%= assignments.length %>)
+      </button>
+      <button class="btn btn-ghost <%= activeTab === 'announcements' ? 'active' : '' %>" data-tab="announcements"
+        style="border-radius:0;border-bottom:2px solid <%= activeTab === 'announcements' ? 'var(--accent)' : 'transparent' %>;padding:0.75rem 1rem">
+        📢 Announcements (<%= announcements.length %>)
+      </button>
+    </div>
+
+    <!-- TAB 1: Syllabus & Topics -->
+    <div data-tab-panel="overview" class="<%= activeTab === 'overview' ? '' : 'hidden' %>">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h3 style="margin:0;font-size:1.1rem;color:var(--text-heading)">Course Topics / Chapters</h3>
+        <% if (isAdmin) { %>
+          <button class="btn btn-primary btn-sm" onclick="document.getElementById('add-topic-modal').classList.remove('hidden')">
+            + Add Topic
+          </button>
+        <% } %>
+      </div>
+
+      <% if (topics.length > 0) { %>
+        <div style="display:flex;flex-direction:column;gap:0.75rem">
+          <% topics.forEach((t, idx) => { %>
+            <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:1rem;flex-wrap:wrap;gap:0.75rem">
+              <div style="display:flex;align-items:flex-start;gap:1rem;min-width:0;flex:1">
+                <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:50%;font-weight:700;font-size:0.85rem;color:var(--accent-light);flex-shrink:0">
+                  <%= idx + 1 %>
+                </span>
+                <div>
+                  <h4 style="margin:0 0 0.25rem;font-size:1rem;color:var(--text-heading)"><%= t.name %></h4>
+                  <p style="margin:0;font-size:0.85rem;color:var(--text-muted)"><%= t.description || 'No description provided.' %></p>
+                </div>
+              </div>
+
+              <div style="display:flex;align-items:center;gap:0.75rem">
+                <a href="/materials?subject_id=<%= subject.id %>&topic_id=<%= t.id %>" class="btn btn-ghost btn-sm" style="font-size:0.8rem">
+                  📚 <%= t.materials_count %> files
+                </a>
+                <a href="/assignments?subject_id=<%= subject.id %>&topic_id=<%= t.id %>" class="btn btn-ghost btn-sm" style="font-size:0.8rem">
+                  📝 <%= t.assignments_count %> tasks
+                </a>
+                <% if (isAdmin) { %>
+                  <form method="POST" action="/subjects/<%= subject.id %>/topics/<%= t.id %>/delete" onsubmit="return confirm('Delete topic \'<%= t.name %>\'?')" style="margin:0">
+                    <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);font-size:0.8rem">✕</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="card" style="text-align:center;padding:2.5rem 1rem">
+          <p style="color:var(--text-muted);margin:0">No topics added for this subject yet.</p>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- TAB 2: Study Materials -->
+    <div data-tab-panel="materials" class="<%= activeTab === 'materials' ? '' : 'hidden' %>">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h3 style="margin:0;font-size:1.1rem;color:var(--text-heading)">Materials for <%= subject.name %></h3>
+        <a href="/materials/upload?subject_id=<%= subject.id %>" class="btn btn-primary btn-sm">+ Upload File</a>
+      </div>
+
+      <% if (materials.length > 0) { %>
+        <div class="card" style="padding:0;overflow:hidden">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title & Description</th>
+                  <th>Category</th>
+                  <th>Topic</th>
+                  <th>Uploaded By</th>
+                  <th>Format</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% materials.forEach(m => { %>
+                  <tr>
+                    <td>
+                      <a href="/materials/<%= m.id %>" style="color:var(--text-heading);font-weight:500;text-decoration:none">
+                        <%= m.title %>
+                      </a>
+                      <% if (m.description) { %>
+                        <div style="font-size:0.78rem;color:var(--text-muted);white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis">
+                          <%= m.description %>
+                        </div>
+                      <% } %>
+                    </td>
+                    <td><span class="badge badge-student"><%= m.category %></span></td>
+                    <td class="td-muted"><%= m.topic_name || 'General' %></td>
+                    <td class="td-muted"><%= m.uploader_name %></td>
+                    <td><span class="badge badge-outline" style="text-transform:uppercase"><%= m.file_type %></span></td>
+                    <td class="td-muted" style="font-size:0.8rem"><%= new Date(m.created_at * 1000).toLocaleDateString('en-GB') %></td>
+                    <td>
+                      <a href="/materials/<%= m.id %>/download" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.6rem">⬇ Download</a>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="card" style="text-align:center;padding:2.5rem 1rem">
+          <p style="color:var(--text-muted);margin:0 0 1rem">No study materials uploaded for this subject yet.</p>
+          <a href="/materials/upload?subject_id=<%= subject.id %>" class="btn btn-secondary btn-sm">+ Upload First Material</a>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- TAB 3: Assignments -->
+    <div data-tab-panel="assignments" class="<%= activeTab === 'assignments' ? '' : 'hidden' %>">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h3 style="margin:0;font-size:1.1rem;color:var(--text-heading)">Course Tasks & Assignments</h3>
+        <a href="/assignments/new?subject_id=<%= subject.id %>" class="btn btn-secondary btn-sm">+ Create Assignment</a>
+      </div>
+
+      <% if (assignments.length > 0) { %>
+        <div style="display:flex;flex-direction:column;gap:0.75rem">
+          <% assignments.forEach(a => { %>
+            <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:1rem;flex-wrap:wrap;gap:1rem">
+              <div style="min-width:0;flex:1">
+                <a href="/assignments/<%= a.id %>" style="color:var(--text-heading);font-weight:600;font-size:1.05rem;text-decoration:none">
+                  <%= a.title %>
+                </a>
+                <div style="display:flex;gap:0.75rem;font-size:0.8rem;color:var(--text-muted);margin-top:0.3rem;flex-wrap:wrap">
+                  <span>Topic: <strong><%= a.topic_name || 'General' %></strong></span>
+                  <span>Created by <strong><%= a.uploader_name %></strong></span>
+                  <span><strong><%= a.solutions_count %></strong> student solution<%= a.solutions_count === 1 ? '' : 's' %></span>
+                </div>
+              </div>
+
+              <div style="display:flex;align-items:center;gap:0.75rem">
+                <% if (a.deadline) { %>
+                  <span class="badge badge-<%= a.deadline >= Math.floor(Date.now()/1000) ? 'approved' : 'suspended' %>">
+                    Due <%= new Date(a.deadline * 1000).toLocaleDateString('en-GB') %>
+                  </span>
+                <% } %>
+                <a href="/assignments/<%= a.id %>" class="btn btn-secondary btn-sm">
+                  View Tasks & Solutions →
+                </a>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="card" style="text-align:center;padding:2.5rem 1rem">
+          <p style="color:var(--text-muted);margin:0 0 1rem">No assignments posted for this subject yet.</p>
+          <a href="/assignments/new?subject_id=<%= subject.id %>" class="btn btn-secondary btn-sm">+ Post Assignment</a>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- TAB 4: Announcements -->
+    <div data-tab-panel="announcements" class="<%= activeTab === 'announcements' ? '' : 'hidden' %>">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h3 style="margin:0;font-size:1.1rem;color:var(--text-heading)">Announcements & Updates</h3>
+        <% if (isAdmin) { %>
+          <button class="btn btn-primary btn-sm" onclick="document.getElementById('add-announcement-modal').classList.remove('hidden')">
+            + Post Announcement
+          </button>
+        <% } %>
+      </div>
+
+      <% if (announcements.length > 0) { %>
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <% announcements.forEach(ann => { %>
+            <div class="card" style="border-left:4px solid var(--accent)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem">
+                <h4 style="margin:0;font-size:1.1rem;color:var(--text-heading)"><%= ann.title %></h4>
+                <span class="badge badge-student" style="font-size:0.75rem">
+                  <%= new Date(ann.created_at * 1000).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) %>
+                </span>
+              </div>
+              <p style="color:var(--text-primary);font-size:0.9rem;line-height:1.6;margin:0 0 0.5rem;white-space:pre-wrap"><%= ann.content %></p>
+              <div style="font-size:0.75rem;color:var(--text-muted)">
+                Posted by <strong><%= ann.author_name %></strong> (<%= ann.author_role %>)
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="card" style="text-align:center;padding:2.5rem 1rem">
+          <p style="color:var(--text-muted);margin:0">No announcements posted for this course yet.</p>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- MODAL: Add Topic (Admin) -->
+    <% if (isAdmin) { %>
+      <div id="add-topic-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:999;padding:1rem">
+        <div class="card" style="width:100%;max-width:480px;background:var(--bg-card);border:1px solid var(--border-light)">
+          <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+            <h3>Add Subject Topic</h3>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('add-topic-modal').classList.add('hidden')">✕</button>
+          </div>
+          <form method="POST" action="/subjects/<%= subject.id %>/topics">
+            <div class="form-group">
+              <label class="form-label" for="topic_name">Topic Name *</label>
+              <input class="form-control" type="text" id="topic_name" name="name" placeholder="e.g. Memory Management & Paging" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="topic_order">Display Order Index</label>
+              <input class="form-control" type="number" id="topic_order" name="order_index" value="<%= topics.length + 1 %>">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="topic_desc">Short Description</label>
+              <textarea class="form-control" id="topic_desc" name="description" rows="2" placeholder="Sub-topics covered in this chapter..."></textarea>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1rem">
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('add-topic-modal').classList.add('hidden')">Cancel</button>
+              <button type="submit" class="btn btn-primary">Add Topic</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL: Edit Subject (Admin) -->
+      <div id="edit-subject-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:999;padding:1rem">
+        <div class="card" style="width:100%;max-width:540px;background:var(--bg-card);border:1px solid var(--border-light)">
+          <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+            <h3>Edit Subject</h3>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('edit-subject-modal').classList.add('hidden')">✕</button>
+          </div>
+          <form method="POST" action="/subjects/<%= subject.id %>/update">
+            <div class="form-group">
+              <label class="form-label" for="edit_name">Subject Name *</label>
+              <input class="form-control" type="text" id="edit_name" name="name" value="<%= subject.name %>" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="edit_code">Subject Code</label>
+              <input class="form-control" type="text" id="edit_code" name="code" value="<%= subject.code || '' %>">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+              <div class="form-group">
+                <label class="form-label" for="edit_semester">Semester *</label>
+                <input class="form-control" type="text" id="edit_semester" name="semester" value="<%= subject.semester %>" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="edit_academic_year">Academic Year *</label>
+                <input class="form-control" type="text" id="edit_academic_year" name="academic_year" value="<%= subject.academic_year %>" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="edit_desc">Description</label>
+              <textarea class="form-control" id="edit_desc" name="description" rows="3"><%= subject.description || '' %></textarea>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1rem">
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('edit-subject-modal').classList.add('hidden')">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL: Post Announcement (Admin) -->
+      <div id="add-announcement-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:999;padding:1rem">
+        <div class="card" style="width:100%;max-width:540px;background:var(--bg-card);border:1px solid var(--border-light)">
+          <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+            <h3>Post Subject Announcement</h3>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('add-announcement-modal').classList.add('hidden')">✕</button>
+          </div>
+          <form method="POST" action="/subjects/<%= subject.id %>/announcements">
+            <div class="form-group">
+              <label class="form-label" for="ann_title">Title *</label>
+              <input class="form-control" type="text" id="ann_title" name="title" placeholder="e.g. Midterm exam format & materials covered" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ann_content">Content *</label>
+              <textarea class="form-control" id="ann_content" name="content" rows="4" placeholder="Announcement details..." required></textarea>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1rem">
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('add-announcement-modal').classList.add('hidden')">Cancel</button>
+              <button type="submit" class="btn btn-primary">Publish Announcement</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    <% } %>
+
+  </main>
+</div>
+
+<script>
+  // Tab switching script
+  document.querySelectorAll('[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      document.querySelectorAll('[data-tab]').forEach(b => {
+        b.classList.remove('active');
+        b.style.borderBottomColor = 'transparent';
+      });
+      document.querySelectorAll('[data-tab-panel]').forEach(p => p.classList.add('hidden'));
+
+      btn.classList.add('active');
+      btn.style.borderBottomColor = 'var(--accent)';
+      const panel = document.querySelector(`[data-tab-panel="${target}"]`);
+      if (panel) panel.classList.remove('hidden');
+    });
+  });
+</script>
+
+<script src="/js/sidebar.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,81 @@
+<nav class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <span class="emblem">⚔ KAZARMA</span>
+    <span class="subtitle">BHOS CE 25</span>
+  </div>
+
+  <!-- Navigation -->
+  <div class="sidebar-nav">
+    <p class="sidebar-section-label">Navigation</p>
+
+    <a href="/dashboard">
+      <span class="nav-icon">🏠</span>
+      Dashboard
+    </a>
+
+    <a href="/subjects">
+      <span class="nav-icon">🏛</span>
+      Subjects
+    </a>
+
+    <a href="/materials">
+      <span class="nav-icon">📚</span>
+      Materials
+    </a>
+
+    <a href="/assignments">
+      <span class="nav-icon">📝</span>
+      Assignments
+    </a>
+
+    <a href="/bookmarks">
+      <span class="nav-icon">🔖</span>
+      Bookmarks
+    </a>
+
+    <% if (user && user.role === 'admin') { %>
+      <p class="sidebar-section-label">Administration</p>
+      <a href="/admin">
+        <span class="nav-icon">⚙</span>
+        Admin Panel
+      </a>
+    <% } %>
+  </div>
+
+  <!-- Bottom: User info + settings/logout -->
+  <div class="sidebar-bottom">
+    <% if (user) { %>
+      <div class="sidebar-user">
+        <div class="avatar avatar-sm">
+          <% if (user.avatar_url) { %>
+            <img src="<%= user.avatar_url %>" alt="<%= user.full_name %>">
+          <% } else { %>
+            <%= user.full_name ? user.full_name.charAt(0).toUpperCase() : '?' %>
+          <% } %>
+        </div>
+        <div class="user-info" style="min-width:0">
+          <div class="name"><%= user.full_name || user.username %></div>
+          <span class="badge badge-<%= user.role %> role-badge"><%= user.role %></span>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="sidebar-bottom-links">
+      <a href="/profile">
+        <span>👤</span> My Profile
+      </a>
+      <a href="/settings">
+        <span>⚙</span> Settings
+      </a>
+      <form method="POST" action="/logout" style="margin:0">
+        <button type="submit" class="btn btn-ghost w-full logout-link" style="justify-content:flex-start;gap:0.6rem;padding:0.45rem 0.5rem;font-size:0.875rem;border-radius:var(--radius)">
+          <span>🚪</span> Logout
+        </button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<!-- Overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>

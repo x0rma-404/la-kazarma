@@ -1,0 +1,115 @@
+<%- include('../partials/head') %>
+<body>
+<div class="app-wrapper">
+  <%- include('../partials/sidebar') %>
+  <%- include('../partials/mobile-nav') %>
+
+  <main class="main-content">
+    <%- include('../partials/flash') %>
+
+    <div class="page-header">
+      <h1>Settings</h1>
+      <p>Manage your account preferences and security.</p>
+    </div>
+
+    <div style="max-width:640px;display:flex;flex-direction:column;gap:1.5rem">
+
+      <!-- Account Info -->
+      <div class="card">
+        <div class="card-header">
+          <h3>👤 Account Information</h3>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;font-size:0.875rem">
+          <div>
+            <div class="form-label">Username</div>
+            <div style="color:var(--text-primary);font-weight:500">@<%= profileUser.username %></div>
+            <div class="form-hint">Cannot be changed</div>
+          </div>
+          <div>
+            <div class="form-label">Student Code</div>
+            <div style="color:var(--text-primary);font-weight:500"><%= profileUser.student_code %></div>
+            <div class="form-hint">Cannot be changed</div>
+          </div>
+          <div style="grid-column:1/-1">
+            <div class="form-label">Email Address</div>
+            <div style="color:var(--text-primary)"><%= profileUser.email %></div>
+            <div class="form-hint">Update from <a href="/profile">Profile page</a></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="card">
+        <div class="card-header">
+          <h3>🔑 Change Password</h3>
+        </div>
+        <form method="POST" action="/settings/password">
+          <div class="form-group">
+            <label class="form-label" for="old_password">Current Password</label>
+            <input class="form-control" type="password" id="old_password" name="old_password"
+              placeholder="Enter current password" required autocomplete="current-password">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new_password">New Password</label>
+            <input class="form-control" type="password" id="password" name="new_password"
+              placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+            <div class="password-strength">
+              <div class="password-strength-bar" id="strength-bar"></div>
+            </div>
+            <span class="strength-label" id="strength-label"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="confirm_new_password">Confirm New Password</label>
+            <input class="form-control" type="password" id="confirm_new_password" name="confirm_new_password"
+              placeholder="Repeat new password" required autocomplete="new-password">
+          </div>
+          <button type="submit" class="btn btn-primary">Update Password</button>
+        </form>
+      </div>
+
+      <!-- Appearance (placeholder) -->
+      <div class="card">
+        <div class="card-header">
+          <h3>🎨 Appearance</h3>
+        </div>
+        <p style="color:var(--text-muted);font-size:0.875rem">
+          Theme customization options will be available in a future update.
+          Currently using the <strong style="color:var(--accent-light)">Dark Military</strong> theme.
+        </p>
+      </div>
+
+      <!-- Language (placeholder) -->
+      <div class="card">
+        <div class="card-header">
+          <h3>🌐 Language</h3>
+        </div>
+        <p style="color:var(--text-secondary);font-size:0.875rem">
+          <strong>English (Default)</strong><br>
+          <span style="color:var(--text-muted)">Additional languages coming soon.</span>
+        </p>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="card" style="border-color:rgba(192,57,43,0.3)">
+        <div class="card-header">
+          <h3 style="color:var(--danger)">⚠ Danger Zone</h3>
+        </div>
+        <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:1rem">
+          Once you delete your account, all your data will be permanently removed. This action cannot be undone.
+        </p>
+        <button class="btn btn-danger btn-sm" disabled title="Contact an administrator to delete your account">
+          Delete Account
+        </button>
+        <div class="form-hint" style="margin-top:0.5rem">
+          Account deletion is currently disabled. Contact an administrator.
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="/js/sidebar.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>
