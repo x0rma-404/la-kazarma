@@ -1,13 +1,14 @@
-<% if (flash) { %>
-  <div class="flash flash-<%= flash.type %>">
-    <span class="flash-icon">
-      <% if (flash.type === 'success') { %>✓
-      <% } else if (flash.type === 'error') { %>✕
-      <% } else if (flash.type === 'warning') { %>⚠
-      <% } else { %>ℹ
-      <% } %>
-    </span>
-    <span class="flash-text"><%- flash.message %></span>
-    <button class="flash-close" aria-label="Dismiss">×</button>
+<% if (success && success.length > 0) { %>
+  <div class="flash flash-success">
+    <% success.forEach(function(msg) { %>
+      <span><%= msg %></span>
+    <% }) %>
+  </div>
+<% } %>
+<% if (error && error.length > 0) { %>
+  <div class="flash flash-error">
+    <% error.forEach(function(msg) { %>
+      <span><%= msg %></span>
+    <% }) %>
   </div>
 <% } %>

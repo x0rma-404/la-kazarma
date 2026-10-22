@@ -1,165 +1,82 @@
 <%- include('../partials/head') %>
-<body>
-<div class="app-wrapper">
+<%- include('../partials/mobile-nav') %>
+<div class="app-layout">
   <%- include('../partials/sidebar') %>
-  <%- include('../partials/mobile-nav') %>
-
   <main class="main-content">
     <%- include('../partials/flash') %>
-
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem">
+    <div class="page-header">
       <div>
-        <h1>🏛 Academic Subjects</h1>
-        <p>Curriculum workspaces, lecture modules, materials, and assignments for BHOS CE 25.</p>
+        <h1>Subjects</h1>
+        <p class="page-subtitle">Browse all your academic subjects</p>
       </div>
-      <% if (isAdmin) { %>
-        <button class="btn btn-primary" onclick="document.getElementById('create-subject-modal').classList.remove('hidden')">
-          + New Subject
+      <% if (user.role === 'admin') { %>
+        <button class="btn btn-primary" onclick="document.getElementById('addSubjectModal').style.display='flex'">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Subject
         </button>
       <% } %>
     </div>
 
-    <!-- Filter / Search Bar -->
-    <div class="card" style="margin-bottom:1.5rem;padding:1rem">
-      <form method="GET" action="/subjects" style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center">
-        <div style="flex:2;min-width:200px">
-          <input type="text" name="search" class="form-control" placeholder="Search subjects by name, code, or description..." value="<%= search %>">
-        </div>
-
-        <div style="flex:1;min-width:160px">
-          <select name="semester" class="form-control">
-            <option value="">All Semesters</option>
-            <% semesters.forEach(s => { %>
-              <option value="<%= s %>" <%= currentSemester === s ? 'selected' : '' %>><%= s %></option>
-            <% }); %>
-          </select>
-        </div>
-
-        <% if (isAdmin) { %>
-          <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;color:var(--text-secondary);cursor:pointer">
-            <input type="checkbox" name="show_archived" value="1" <%= showArchived ? 'checked' : '' %> onchange="this.form.submit()">
-            Show archived
-          </label>
-        <% } %>
-
-        <div style="display:flex;gap:0.5rem">
-          <button type="submit" class="btn btn-secondary">Filter</button>
-          <% if (search || currentSemester || showArchived) { %>
-            <a href="/subjects" class="btn btn-ghost">Reset</a>
-          <% } %>
-        </div>
-      </form>
-    </div>
-
-    <!-- Subjects Grid -->
-    <% if (subjects.length > 0) { %>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:1.5rem">
-        <% subjects.forEach(s => { %>
-          <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;position:relative;<%= s.is_archived ? 'opacity:0.7;border-style:dashed;' : '' %>">
-            <div>
-              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;gap:0.5rem">
-                <div>
-                  <% if (s.code) { %>
-                    <span class="badge badge-outline" style="font-size:0.75rem;letter-spacing:0.05em;margin-bottom:0.35rem;display:inline-block"><%= s.code %></span>
-                  <% } %>
-                  <h3 style="font-size:1.15rem;margin:0">
-                    <a href="/subjects/<%= s.id %>" style="color:var(--text-heading);text-decoration:none">
-                      <%= s.name %>
-                    </a>
-                  </h3>
-                </div>
-                <div style="text-align:right">
-                  <span class="badge badge-student" style="font-size:0.75rem"><%= s.semester %></span>
-                  <% if (s.is_archived) { %>
-                    <div style="margin-top:0.3rem"><span class="badge badge-suspended" style="font-size:0.7rem">Archived</span></div>
-                  <% } %>
-                </div>
-              </div>
-
-              <p style="color:var(--text-secondary);font-size:0.875rem;line-height:1.5;margin-bottom:1.25rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">
-                <%= s.description || 'No description provided for this subject.' %>
-              </p>
-            </div>
-
-            <div>
-              <div style="display:flex;gap:1rem;padding-top:0.75rem;border-top:1px solid var(--border);margin-bottom:1rem;font-size:0.8rem;color:var(--text-muted)">
-                <span>📖 <strong><%= s.topics_count %></strong> Topics</span>
-                <span>📚 <strong><%= s.materials_count %></strong> Materials</span>
-                <span>📝 <strong><%= s.assignments_count %></strong> Tasks</span>
-              </div>
-
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <a href="/subjects/<%= s.id %>" class="btn btn-secondary btn-sm" style="flex:1;text-align:center">
-                  Open Workspace →
-                </a>
-                <% if (isAdmin) { %>
-                  <form method="POST" action="/subjects/<%= s.id %>/archive" style="margin:0 0 0 0.5rem">
-                    <button type="submit" class="btn btn-ghost btn-sm" title="<%= s.is_archived ? 'Unarchive' : 'Archive' %>" style="font-size:0.8rem">
-                      <%= s.is_archived ? '↺ Restore' : '📦 Archive' %>
-                    </button>
-                  </form>
-                <% } %>
-              </div>
-            </div>
-          </div>
-        <% }); %>
+    <% if (subjects.length === 0) { %>
+      <div class="empty-state-card">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <h3>No subjects yet</h3>
+        <p>Subjects will appear here once they are created.</p>
       </div>
     <% } else { %>
-      <div class="card" style="text-align:center;padding:3rem 1.5rem">
-        <span style="font-size:3rem">🏛</span>
-        <h3 style="margin-top:1rem;color:var(--text-heading)">No subjects found</h3>
-        <p style="color:var(--text-muted);max-width:400px;margin:0.5rem auto 1.5rem">
-          No academic subjects match your active search or filter criteria.
-        </p>
-        <a href="/subjects" class="btn btn-secondary">Clear Filters</a>
+      <div class="subjects-list">
+        <% subjects.forEach(function(s) { %>
+          <a href="/subjects/<%= s.id %>" class="subject-card">
+            <div class="subject-card-header">
+              <div class="subject-card-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </div>
+              <% if (s.code) { %><span class="subject-code"><%= s.code %></span><% } %>
+            </div>
+            <h3><%= s.name %></h3>
+            <% if (s.description) { %><p><%= s.description %></p><% } %>
+            <% if (s.semester) { %><span class="subject-semester">Semester <%= s.semester %></span><% } %>
+          </a>
+        <% }) %>
       </div>
     <% } %>
 
-    <!-- Create Subject Modal (Admin only) -->
-    <% if (isAdmin) { %>
-      <div id="create-subject-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:999;padding:1rem">
-        <div class="card" style="width:100%;max-width:540px;background:var(--bg-card);border:1px solid var(--border-light)">
-          <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
-            <h3>Create Academic Subject</h3>
-            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('create-subject-modal').classList.add('hidden')">✕</button>
+    <% if (user.role === 'admin') { %>
+      <div class="modal" id="addSubjectModal" style="display:none">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Add Subject</h2>
+            <button class="modal-close" onclick="document.getElementById('addSubjectModal').style.display='none'">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           </div>
-          <form method="POST" action="/subjects">
+          <form action="/subjects" method="POST" class="modal-form">
             <div class="form-group">
-              <label class="form-label" for="subject_name">Subject Name *</label>
-              <input class="form-control" type="text" id="subject_name" name="name" placeholder="e.g. Distributed Systems" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="subject_code">Subject Code</label>
-              <input class="form-control" type="text" id="subject_code" name="code" placeholder="e.g. CE 405">
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-              <div class="form-group">
-                <label class="form-label" for="semester">Semester *</label>
-                <input class="form-control" type="text" id="semester" name="semester" placeholder="e.g. Fall 2025" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="academic_year">Academic Year *</label>
-                <input class="form-control" type="text" id="academic_year" name="academic_year" placeholder="e.g. 2025-2026" required>
-              </div>
+              <label>Name</label>
+              <input type="text" name="name" required placeholder="Subject name">
             </div>
             <div class="form-group">
-              <label class="form-label" for="subject_desc">Description</label>
-              <textarea class="form-control" id="subject_desc" name="description" rows="3" placeholder="Course syllabus overview, expectations, and focus areas..."></textarea>
+              <label>Code</label>
+              <input type="text" name="code" placeholder="e.g. CS101">
             </div>
-            <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1rem">
-              <button type="button" class="btn btn-secondary" onclick="document.getElementById('create-subject-modal').classList.add('hidden')">Cancel</button>
-              <button type="submit" class="btn btn-primary">Create Subject</button>
+            <div class="form-group">
+              <label>Semester</label>
+              <input type="text" name="semester" placeholder="e.g. 1">
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea name="description" rows="3" placeholder="Brief description"></textarea>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('addSubjectModal').style.display='none'">Cancel</button>
+              <button type="submit" class="btn btn-primary">Create</button>
             </div>
           </form>
         </div>
       </div>
     <% } %>
-
   </main>
 </div>
-
 <script src="/js/sidebar.js"></script>
-<script src="/js/main.js"></script>
 </body>
 </html>
-

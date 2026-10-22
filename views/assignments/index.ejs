@@ -1,192 +1,58 @@
 <%- include('../partials/head') %>
-<body>
-<div class="app-wrapper">
+<%- include('../partials/mobile-nav') %>
+<div class="app-layout">
   <%- include('../partials/sidebar') %>
-  <%- include('../partials/mobile-nav') %>
-
   <main class="main-content">
     <%- include('../partials/flash') %>
-
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem">
+    <div class="page-header">
       <div>
-        <h1>📝 Academic Assignments</h1>
-        <p>Course problem sets, coding tasks, project deliverables, and collaborative peer solution hub.</p>
+        <h1>Assignments</h1>
+        <p class="page-subtitle">All assignments across subjects</p>
       </div>
-      <a href="/assignments/new" class="btn btn-primary">
-        + Create Assignment
-      </a>
+      <% if (user.role === 'admin') { %>
+        <a href="/assignments/new" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Assignment
+        </a>
+      <% } %>
     </div>
 
-    <!-- Filter Bar -->
-    <div class="card" style="margin-bottom:1.5rem;padding:1.25rem">
-      <form method="GET" action="/assignments" id="assignment-filter-form">
-        <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap">
-          <div style="flex:3;min-width:240px">
-            <input type="text" name="search" class="form-control" placeholder="Search assignments by title, description, or tags..." value="<%= filters.search || '' %>">
-          </div>
-          <div style="flex:1;min-width:160px">
-            <select name="status" class="form-control" onchange="this.form.submit()">
-              <option value="all" <%= filters.status === 'all' ? 'selected' : '' %>>All Deadlines</option>
-              <option value="active" <%= filters.status === 'active' ? 'selected' : '' %>>Active Only</option>
-              <option value="past" <%= filters.status === 'past' ? 'selected' : '' %>>Past Due</option>
-            </select>
-          </div>
-          <div style="display:flex;gap:0.5rem">
-            <button type="submit" class="btn btn-secondary">Filter</button>
-            <a href="/assignments" class="btn btn-ghost">Reset</a>
-          </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
-          <div>
-            <select name="subject_id" id="assignment-subject-select" class="form-control" onchange="handleSubjectChange(this.value)">
-              <option value="">All Subjects</option>
-              <% subjects.forEach(s => { %>
-                <option value="<%= s.id %>" <%= filters.subjectId === s.id ? 'selected' : '' %>>
-                  <%= s.code ? s.code + ' – ' : '' %><%= s.name %>
-                </option>
-              <% }); %>
-            </select>
-          </div>
-          <div>
-            <select name="topic_id" id="assignment-topic-select" class="form-control" onchange="this.form.submit()">
-              <option value="">All Topics</option>
-              <% topics.forEach(t => { %>
-                <option value="<%= t.id %>" <%= filters.topicId === t.id ? 'selected' : '' %>><%= t.name %></option>
-              <% }); %>
-            </select>
-          </div>
-        </div>
-      </form>
-    </div>
-
-    <!-- Results Overview -->
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;font-size:0.875rem;color:var(--text-muted)">
-      <span>Found <strong><%= totalAssignments %></strong> assignment<%= totalAssignments === 1 ? '' : 's' %></span>
-      <span>Page <%= currentPage %> of <%= totalPages %></span>
-    </div>
-
-    <!-- Assignments List -->
-    <% if (assignments.length > 0) { %>
-      <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem">
-        <% assignments.forEach(a => { %>
-          <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:1.25rem;flex-wrap:wrap;gap:1.25rem">
-            <div style="min-width:0;flex:2">
-              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem;flex-wrap:wrap">
-                <span class="badge badge-admin" style="font-size:0.75rem">
-                  <%= a.subject_code ? a.subject_code + ' · ' : '' %><%= a.subject_name %>
-                </span>
-                <% if (a.topic_name) { %>
-                  <span class="badge badge-student" style="font-size:0.75rem"><%= a.topic_name %></span>
-                <% } %>
-                <% if (a.file_type) { %>
-                  <span class="badge badge-outline" style="text-transform:uppercase;font-size:0.7rem">Attached .<%= a.file_type %></span>
-                <% } %>
+    <% if (assignments.length === 0) { %>
+      <div class="empty-state-card">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <h3>No assignments yet</h3>
+        <p>Assignments will appear here once they are created.</p>
+      </div>
+    <% } else { %>
+      <div class="assignments-list">
+        <% assignments.forEach(function(a) { %>
+          <a href="/assignments/<%= a.id %>" class="assignment-card">
+            <div class="assignment-card-header">
+              <div class="assignment-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
               </div>
-
-              <h2 style="font-size:1.2rem;margin:0 0 0.4rem">
-                <a href="/assignments/<%= a.id %>" style="color:var(--text-heading);text-decoration:none">
-                  <%= a.title %>
-                </a>
-              </h2>
-
-              <% if (a.description) { %>
-                <p style="color:var(--text-secondary);font-size:0.875rem;margin:0 0 0.6rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">
-                  <%= a.description %>
-                </p>
-              <% } %>
-
-              <div style="font-size:0.8rem;color:var(--text-muted)">
-                Posted by <strong><%= a.uploader_name %></strong> · <%= new Date(a.created_at * 1000).toLocaleDateString('en-GB') %>
+              <div>
+                <h3><%= a.title %></h3>
+                <span class="assignment-subject"><%= a.subject ? a.subject.name : '' %></span>
               </div>
             </div>
-
-            <!-- Right: Deadline & Solutions stats -->
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.6rem;min-width:180px">
-              <% if (a.deadline) { %>
-                <% const isDueSoon = a.deadline >= Math.floor(Date.now()/1000); %>
-                <span class="badge badge-<%= isDueSoon ? 'approved' : 'suspended' %>" style="font-size:0.8rem">
-                  <%= isDueSoon ? '⏳ Due ' : '⚠️ Expired ' %><%= new Date(a.deadline * 1000).toLocaleDateString('en-GB', { day:'numeric', month:'short' }) %>
+            <% if (a.description) { %><p class="assignment-desc"><%= a.description.substring(0, 120) %><% if (a.description.length > 120) { %>...<% } %></p><% } %>
+            <div class="assignment-footer">
+              <% if (a.due_date) { %>
+                <span class="assignment-due <%= new Date(a.due_date) < new Date() ? 'overdue' : '' %>">
+                  Due: <%= new Date(a.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
                 </span>
               <% } else { %>
-                <span class="badge badge-student" style="font-size:0.75rem">No deadline</span>
+                <span class="assignment-due">No deadline</span>
               <% } %>
-
-              <div style="font-size:0.85rem;color:var(--accent-light);font-weight:600">
-                💡 <%= a.solutions_count %> solution<%= a.solutions_count === 1 ? '' : 's' %> submitted
-              </div>
-
-              <a href="/assignments/<%= a.id %>" class="btn btn-secondary btn-sm" style="width:100%;text-align:center">
-                Workspace & Solutions →
-              </a>
+              <span>Max score: <%= a.max_score || 100 %></span>
             </div>
-          </div>
-        <% }); %>
-      </div>
-
-      <!-- Pagination -->
-      <% if (totalPages > 1) { %>
-        <div style="display:flex;justify-content:center;gap:0.4rem;margin:2rem 0">
-          <% if (currentPage > 1) { %>
-            <a href="/assignments?page=<%= currentPage - 1 %>" class="btn btn-secondary btn-sm">← Prev</a>
-          <% } %>
-          <% for (let p = 1; p <= totalPages; p++) { %>
-            <a href="/assignments?page=<%= p %>" class="btn <%= currentPage === p ? 'btn-primary' : 'btn-ghost' %> btn-sm">
-              <%= p %>
-            </a>
-          <% } %>
-          <% if (currentPage < totalPages) { %>
-            <a href="/assignments?page=<%= currentPage + 1 %>" class="btn btn-secondary btn-sm">Next →</a>
-          <% } %>
-        </div>
-      <% } %>
-
-    <% } else { %>
-      <div class="card" style="text-align:center;padding:3rem 1.5rem">
-        <span style="font-size:3rem">📝</span>
-        <h3 style="margin-top:1rem;color:var(--text-heading)">No assignments found</h3>
-        <p style="color:var(--text-muted);max-width:400px;margin:0.5rem auto 1.5rem">
-          No assignments match your search or filter criteria.
-        </p>
-        <div style="display:flex;justify-content:center;gap:0.75rem">
-          <a href="/assignments" class="btn btn-secondary">Clear Filters</a>
-          <a href="/assignments/new" class="btn btn-primary">+ Create Assignment</a>
-        </div>
+          </a>
+        <% }) %>
       </div>
     <% } %>
-
   </main>
 </div>
-
-<script>
-  async function handleSubjectChange(subjectId) {
-    const topicSelect = document.getElementById('assignment-topic-select');
-    topicSelect.innerHTML = '<option value="">All Topics</option>';
-    if (!subjectId) {
-      document.getElementById('assignment-filter-form').submit();
-      return;
-    }
-
-    try {
-      const resp = await fetch(`/subjects/${subjectId}/topics-json`);
-      const data = await resp.json();
-      if (data.success && data.topics) {
-        data.topics.forEach(t => {
-          const opt = document.createElement('option');
-          opt.value = t.id;
-          opt.textContent = t.name;
-          topicSelect.appendChild(opt);
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-    document.getElementById('assignment-filter-form').submit();
-  }
-</script>
-
 <script src="/js/sidebar.js"></script>
-<script src="/js/main.js"></script>
 </body>
 </html>
-

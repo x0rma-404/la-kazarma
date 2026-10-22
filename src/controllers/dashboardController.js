@@ -1,41 +1,34 @@
-'use strict';
-
-const User = require('../models/User');
 const Subject = require('../models/Subject');
 const Material = require('../models/Material');
 const Assignment = require('../models/Assignment');
-const Bookmark = require('../models/Bookmark');
+const Solution = require('../models/Solution');
+const User = require('../models/User');
 
-function index(req, res) {
-  const sessionUser = req.session.user;
-  let pendingCount = 0;
-  let totalUsers = 0;
+exports.index = async (req, res, next) => {
+  try {
+    const userId = req.session.user.id;
+    const [subjects, recentMaterials, upcomingAssignments, mySolutions] = await Promise.all([
+      Subject.findAll(),
+      Material.findRecent(5),
+      Assignment.findUpcoming(5),
+      Solution.findByUser(userId),
+    ]);
 
-  if (sessionUser.role === 'admin') {
-    pendingCount = User.countByStatus('pending');
-    totalUsers   = User.countAll();
+    res.render('dashboard/index', {
+      title: 'Dashboard',
+      currentPage: 'dashboard',
+      subjects,
+      recentMaterials,
+      upcomingAssignments,
+      mySolutions,
+      stats: {
+        subjects: subjects.length,
+        materials: await Material.count(),
+        assignments: await Assignment.count(),
+        members: await User.count(),
+      },
+    });
+  } catch (err) {
+    next(err);
   }
-
-  const userUploadsCount = Material.countByUploader(sessionUser.id);
-  const totalAssignmentsCount = Assignment.countAll();
-  const userBookmarksCount = Bookmark.countByUser(sessionUser.id);
-  const totalSubjectsCount = Subject.countAll(false);
-
-  // Recent materials for activity feed
-  const recentMaterials = Material.findAll({ limit: 4 });
-  const recentAssignments = Assignment.findAll({ limit: 4, status: 'active' });
-
-  res.render('dashboard/index', {
-    title: 'Dashboard – La Kazarma',
-    pendingCount,
-    totalUsers,
-    userUploadsCount,
-    totalAssignmentsCount,
-    userBookmarksCount,
-    totalSubjectsCount,
-    recentMaterials,
-    recentAssignments
-  });
-}
-
-module.exports = { index };
+};

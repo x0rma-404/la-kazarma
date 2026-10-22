@@ -1,162 +1,52 @@
 <%- include('../partials/head') %>
-<body>
-<div class="app-wrapper">
+<%- include('../partials/mobile-nav') %>
+<div class="app-layout">
   <%- include('../partials/sidebar') %>
-  <%- include('../partials/mobile-nav') %>
-
   <main class="main-content">
     <%- include('../partials/flash') %>
-
-    <div style="margin-bottom:1rem">
-      <a href="/assignments" class="btn btn-ghost btn-sm">← Back to Assignments</a>
-    </div>
-
     <div class="page-header">
-      <h1>📝 Create New Assignment</h1>
-      <p>Publish an assignment specification, laboratory task, or problem set for students to solve.</p>
+      <h1>New Assignment</h1>
     </div>
 
-    <div style="max-width:760px">
-      <div class="card">
-        <form method="POST" action="/assignments/new" enctype="multipart/form-data">
-          <!-- Title -->
+    <div class="card">
+      <div class="card-body">
+        <form action="/assignments/new" method="POST" class="auth-form">
           <div class="form-group">
-            <label class="form-label" for="assign_title">Assignment Title *</label>
-            <input class="form-control" type="text" id="assign_title" name="title" placeholder="e.g. Lab 2: Multi-threaded Producer-Consumer Implementation" required>
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" required placeholder="Assignment title">
           </div>
-
-          <!-- Subject & Topic -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-            <div class="form-group">
-              <label class="form-label" for="assign_subject">Subject *</label>
-              <select name="subject_id" id="assign_subject" class="form-control" required onchange="loadTopicsForAssignment(this.value)">
-                <option value="">Select a Subject...</option>
-                <% subjects.forEach(s => { %>
-                  <option value="<%= s.id %>" <%= selectedSubjectId === s.id ? 'selected' : '' %>>
-                    <%= s.code ? s.code + ' – ' : '' %><%= s.name %>
-                  </option>
-                <% }); %>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="assign_topic">Topic / Chapter</label>
-              <select name="topic_id" id="assign_topic" class="form-control">
-                <option value="">General</option>
-                <% topics.forEach(t => { %>
-                  <option value="<%= t.id %>"><%= t.name %></option>
-                <% }); %>
-              </select>
-            </div>
-          </div>
-
-          <!-- Original Assignment File (Optional / Recommended) -->
           <div class="form-group">
-            <label class="form-label">Original Assignment Specification File (PDF, DOCX, etc.)</label>
-            <div id="assign-drop-zone" style="border:2px dashed var(--border-light);border-radius:var(--radius);padding:1.5rem;text-align:center;background:rgba(255,255,255,0.015);cursor:pointer">
-              <span style="font-size:1.8rem;display:block;margin-bottom:0.35rem">📄</span>
-              <div style="font-size:0.95rem;color:var(--text-heading)">Select original assignment document</div>
-              <p style="font-size:0.75rem;color:var(--text-muted);margin:0.25rem 0 0">
-                Supported: <%= allowedExtensions.map(e => e.toUpperCase()).join(', ') %> (up to <%= maxFileSizeMb %> MB)
-              </p>
-              <input type="file" name="file" id="assign-file-input" style="display:none">
-            </div>
-            <div id="assign-file-info" class="hidden" style="margin-top:0.5rem;padding:0.6rem 0.8rem;background:rgba(107,124,62,0.1);border:1px solid var(--accent);border-radius:var(--radius);display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <strong id="assign-file-name" style="color:var(--text-heading);font-size:0.9rem"></strong>
-                <span id="assign-file-size" style="font-size:0.75rem;color:var(--text-muted);display:block"></span>
-              </div>
-              <button type="button" class="btn btn-ghost btn-sm" id="btn-remove-assign-file" style="color:var(--danger)">Remove</button>
-            </div>
+            <label for="subject_id">Subject</label>
+            <select id="subject_id" name="subject_id" required>
+              <option value="">Select a subject</option>
+              <% subjects.forEach(function(s) { %>
+                <option value="<%= s.id %>"><%= s.name %><% if (s.code) { %> (<%= s.code %>)<% } %></option>
+              <% }) %>
+            </select>
           </div>
-
-          <!-- Description / Instructions -->
           <div class="form-group">
-            <label class="form-label" for="assign_desc">Description & Instructions</label>
-            <textarea class="form-control" id="assign_desc" name="description" rows="4" placeholder="Detail the task objectives, requirements, submission format, grading criteria..."></textarea>
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" placeholder="Assignment details and instructions"></textarea>
           </div>
-
-          <!-- Deadline -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="deadline_date">Deadline Date (Optional)</label>
-              <input class="form-control" type="date" id="deadline_date" name="deadline_date">
+              <label for="due_date">Due Date</label>
+              <input type="datetime-local" id="due_date" name="due_date">
             </div>
             <div class="form-group">
-              <label class="form-label" for="deadline_time">Deadline Time (Optional)</label>
-              <input class="form-control" type="time" id="deadline_time" name="deadline_time" value="23:59">
+              <label for="max_score">Max Score</label>
+              <input type="number" id="max_score" name="max_score" value="100" min="1">
             </div>
           </div>
-
-          <!-- Tags -->
-          <div class="form-group">
-            <label class="form-label" for="assign_tags">Tags</label>
-            <input class="form-control" type="text" id="assign_tags" name="tags" placeholder="e.g. threads, c++, mutex, lab-2">
-          </div>
-
-          <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1.5rem">
+          <div class="form-actions">
             <a href="/assignments" class="btn btn-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary">Create Assignment</button>
           </div>
         </form>
       </div>
     </div>
-
   </main>
 </div>
-
-<script>
-  const dropZone = document.getElementById('assign-drop-zone');
-  const fileInput = document.getElementById('assign-file-input');
-  const fileInfo = document.getElementById('assign-file-info');
-  const fileName = document.getElementById('assign-file-name');
-  const fileSize = document.getElementById('assign-file-size');
-  const btnRemove = document.getElementById('btn-remove-assign-file');
-
-  dropZone.addEventListener('click', () => fileInput.click());
-
-  fileInput.addEventListener('change', () => {
-    if (fileInput.files.length > 0) {
-      const file = fileInput.files[0];
-      fileName.textContent = file.name;
-      fileSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-      fileInfo.classList.remove('hidden');
-      fileInfo.style.display = 'flex';
-      dropZone.style.display = 'none';
-    }
-  });
-
-  btnRemove.addEventListener('click', () => {
-    fileInput.value = '';
-    fileInfo.classList.add('hidden');
-    fileInfo.style.display = 'none';
-    dropZone.style.display = 'block';
-  });
-
-  async function loadTopicsForAssignment(subjectId) {
-    const topicSelect = document.getElementById('assign_topic');
-    topicSelect.innerHTML = '<option value="">General</option>';
-    if (!subjectId) return;
-
-    try {
-      const resp = await fetch(`/subjects/${subjectId}/topics-json`);
-      const data = await resp.json();
-      if (data.success && data.topics) {
-        data.topics.forEach(t => {
-          const opt = document.createElement('option');
-          opt.value = t.id;
-          opt.textContent = t.name;
-          topicSelect.appendChild(opt);
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-</script>
-
 <script src="/js/sidebar.js"></script>
-<script src="/js/main.js"></script>
 </body>
 </html>
-

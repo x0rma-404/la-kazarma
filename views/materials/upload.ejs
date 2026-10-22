@@ -1,198 +1,95 @@
 <%- include('../partials/head') %>
-<body>
-<div class="app-wrapper">
+<%- include('../partials/mobile-nav') %>
+<div class="app-layout">
   <%- include('../partials/sidebar') %>
-  <%- include('../partials/mobile-nav') %>
-
   <main class="main-content">
     <%- include('../partials/flash') %>
-
-    <div style="margin-bottom:1rem">
-      <a href="/materials" class="btn btn-ghost btn-sm">← Back to Materials</a>
-    </div>
-
     <div class="page-header">
-      <h1>⬆ Upload Study Material</h1>
-      <p>Share lecture slides, notes, assignments, or study guides with the CE 25 cohort.</p>
+      <h1>Upload Material</h1>
+      <p class="page-subtitle">Share study materials with the group</p>
     </div>
 
-    <div style="max-width:760px">
-      <div class="card">
-        <form method="POST" action="/materials/upload" enctype="multipart/form-data" id="upload-form">
-          <!-- File Drop Zone -->
+    <div class="card">
+      <div class="card-body">
+        <form action="/materials/upload" method="POST" enctype="multipart/form-data" class="auth-form">
           <div class="form-group">
-            <label class="form-label">Document or File *</label>
-            <div id="drop-zone" style="border:2px dashed var(--border-light);border-radius:var(--radius);padding:2.5rem 1.5rem;text-align:center;background:rgba(255,255,255,0.015);cursor:pointer;transition:border-color 0.2s, background 0.2s">
-              <span style="font-size:2.5rem;display:block;margin-bottom:0.75rem">📁</span>
-              <div style="font-weight:600;font-size:1.05rem;color:var(--text-heading);margin-bottom:0.35rem">
-                Click to browse or drag & drop file here
-              </div>
-              <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 0.5rem">
-                Supported: <%= allowedExtensions.map(e => e.toUpperCase()).join(', ') %>
-              </p>
-              <span class="badge badge-student" style="font-size:0.75rem">Maximum size: <%= maxFileSizeMb %> MB</span>
-              <input type="file" name="file" id="file-input" style="display:none" required>
-            </div>
-            <!-- File selected preview -->
-            <div id="file-info" class="hidden" style="margin-top:0.75rem;padding:0.75rem 1rem;background:rgba(107,124,62,0.1);border:1px solid var(--accent);border-radius:var(--radius);display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <strong id="file-info-name" style="color:var(--text-heading);display:block"></strong>
-                <span id="file-info-size" style="font-size:0.8rem;color:var(--text-muted)"></span>
-              </div>
-              <button type="button" class="btn btn-ghost btn-sm" id="btn-remove-file" style="color:var(--danger)">Remove</button>
-            </div>
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" required placeholder="Material title">
           </div>
-
-          <!-- Title -->
           <div class="form-group">
-            <label class="form-label" for="mat_title">Material Title *</label>
-            <input class="form-control" type="text" id="mat_title" name="title" placeholder="e.g. Lecture 04: Process Scheduling & Context Switching" required>
-          </div>
-
-          <!-- Subject & Topic Dropdowns -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-            <div class="form-group">
-              <label class="form-label" for="subject_id">Subject *</label>
-              <select name="subject_id" id="subject_id" class="form-control" required onchange="loadTopicsForSubject(this.value)">
-                <option value="">Select a Subject...</option>
-                <% subjects.forEach(s => { %>
-                  <option value="<%= s.id %>" <%= selectedSubjectId === s.id ? 'selected' : '' %>>
-                    <%= s.code ? s.code + ' – ' : '' %><%= s.name %>
-                  </option>
-                <% }); %>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="topic_id">Topic / Chapter</label>
-              <select name="topic_id" id="topic_id" class="form-control">
-                <option value="">General (No specific topic)</option>
-                <% topics.forEach(t => { %>
-                  <option value="<%= t.id %>" <%= selectedTopicId === t.id ? 'selected' : '' %>><%= t.name %></option>
-                <% }); %>
-              </select>
-            </div>
-          </div>
-
-          <!-- Category -->
-          <div class="form-group">
-            <label class="form-label" for="category">Category *</label>
-            <select name="category" id="category" class="form-control" required>
-              <option value="">Select Category...</option>
-              <% categories.forEach(c => { %>
-                <option value="<%= c %>"><%= c %></option>
-              <% }); %>
+            <label for="subject_id">Subject</label>
+            <select id="subject_id" name="subject_id" required onchange="updateTopics(this.value)">
+              <option value="">Select a subject</option>
+              <% subjects.forEach(function(s) { %>
+                <option value="<%= s.id %>" <%= subjectId === s.id ? 'selected' : '' %>><%= s.name %><% if (s.code) { %> (<%= s.code %>)<% } %></option>
+              <% }) %>
             </select>
           </div>
-
-          <!-- Description -->
-          <div class="form-group">
-            <label class="form-label" for="description">Description & Notes</label>
-            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief summary of lecture content, slide references, professor notes..."></textarea>
+          <div class="form-group" id="topicGroup" style="display:none">
+            <label for="topic_id">Topic (optional)</label>
+            <select id="topic_id" name="topic_id">
+              <option value="">No specific topic</option>
+            </select>
           </div>
-
-          <!-- Tags -->
           <div class="form-group">
-            <label class="form-label" for="tags">Tags</label>
-            <input class="form-control" type="text" id="tags" name="tags" placeholder="e.g. cpu, scheduling, midterm-prep, slides (comma-separated)">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="3" placeholder="Brief description of the material"></textarea>
           </div>
-
-          <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1.5rem">
+          <div class="form-group">
+            <label for="file">File</label>
+            <div class="file-upload-zone" id="fileZone">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p>Click to select a file or drag and drop</p>
+              <span id="fileName">No file selected</span>
+              <input type="file" id="file" name="file" required style="display:none">
+            </div>
+          </div>
+          <div class="form-actions">
             <a href="/materials" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary" id="btn-submit">
-              Upload Material
-            </button>
+            <button type="submit" class="btn btn-primary">Upload</button>
           </div>
         </form>
       </div>
     </div>
-
   </main>
 </div>
-
-<script>
-  const dropZone = document.getElementById('drop-zone');
-  const fileInput = document.getElementById('file-input');
-  const fileInfo = document.getElementById('file-info');
-  const fileInfoName = document.getElementById('file-info-name');
-  const fileInfoSize = document.getElementById('file-info-size');
-  const btnRemove = document.getElementById('btn-remove-file');
-
-  dropZone.addEventListener('click', () => fileInput.click());
-
-  ['dragenter', 'dragover'].forEach(name => {
-    dropZone.addEventListener(name, (e) => {
-      e.preventDefault();
-      dropZone.style.borderColor = 'var(--accent)';
-      dropZone.style.background = 'rgba(107,124,62,0.08)';
-    });
-  });
-
-  ['dragleave', 'drop'].forEach(name => {
-    dropZone.addEventListener(name, (e) => {
-      e.preventDefault();
-      dropZone.style.borderColor = 'var(--border-light)';
-      dropZone.style.background = 'rgba(255,255,255,0.015)';
-    });
-  });
-
-  dropZone.addEventListener('drop', (e) => {
-    if (e.dataTransfer.files.length > 0) {
-      fileInput.files = e.dataTransfer.files;
-      handleFileSelected();
-    }
-  });
-
-  fileInput.addEventListener('change', handleFileSelected);
-
-  function handleFileSelected() {
-    if (fileInput.files.length > 0) {
-      const file = fileInput.files[0];
-      fileInfoName.textContent = file.name;
-      fileInfoSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-      fileInfo.classList.remove('hidden');
-      fileInfo.style.display = 'flex';
-      dropZone.style.display = 'none';
-
-      // Auto-fill title if empty
-      const titleInput = document.getElementById('mat_title');
-      if (!titleInput.value) {
-        titleInput.value = file.name.replace(/\.[^/.]+$/, '').replace(/[_\\-]/g, ' ');
-      }
-    }
-  }
-
-  btnRemove.addEventListener('click', () => {
-    fileInput.value = '';
-    fileInfo.classList.add('hidden');
-    fileInfo.style.display = 'none';
-    dropZone.style.display = 'block';
-  });
-
-  async function loadTopicsForSubject(subjectId) {
-    const topicSelect = document.getElementById('topic_id');
-    topicSelect.innerHTML = '<option value="">General (No specific topic)</option>';
-    if (!subjectId) return;
-
-    try {
-      const resp = await fetch(`/subjects/${subjectId}/topics-json`);
-      const data = await resp.json();
-      if (data.success && data.topics) {
-        data.topics.forEach(t => {
-          const opt = document.createElement('option');
-          opt.value = t.id;
-          opt.textContent = t.name;
-          topicSelect.appendChild(opt);
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-</script>
-
 <script src="/js/sidebar.js"></script>
-<script src="/js/main.js"></script>
+<script>
+const topics = <% if (subjectId && topics.length > 0) { %><%- JSON.stringify(topics) %><% } else { %>{}<% } %>;
+const allSubjects = {
+  <% subjects.forEach(function(s) { %>
+    "<%= s.id %>": [],
+  <% }) %>
+};
+
+function updateTopics(subjectId) {
+  const topicGroup = document.getElementById('topicGroup');
+  const topicSelect = document.getElementById('topic_id');
+  if (!subjectId) {
+    topicGroup.style.display = 'none';
+    return;
+  }
+  topicGroup.style.display = 'block';
+  fetch('/subjects/' + subjectId).then(() => {});
+}
+
+const fileZone = document.getElementById('fileZone');
+const fileInput = document.getElementById('file');
+const fileName = document.getElementById('fileName');
+fileZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) fileName.textContent = fileInput.files[0].name;
+});
+fileZone.addEventListener('dragover', (e) => { e.preventDefault(); fileZone.classList.add('dragover'); });
+fileZone.addEventListener('dragleave', () => fileZone.classList.remove('dragover'));
+fileZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  fileZone.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) {
+    fileInput.files = e.dataTransfer.files;
+    fileName.textContent = e.dataTransfer.files[0].name;
+  }
+});
+</script>
 </body>
 </html>
-

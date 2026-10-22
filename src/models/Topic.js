@@ -1,45 +1,41 @@
-'use strict';
-
-const db = require('../config/database');
+const supabase = require('../config/database');
 
 const Topic = {
-  findBySubjectId(subjectId) {
-    return db.prepare(`
-      SELECT t.*,
-             (SELECT COUNT(*) FROM materials WHERE topic_id = t.id) AS materials_count,
-             (SELECT COUNT(*) FROM assignments WHERE topic_id = t.id) AS assignments_count
-      FROM topics t
-      WHERE t.subject_id = ?
-      ORDER BY t.order_index ASC, t.id ASC
-    `).all(subjectId);
+  async create({ subject_id, name, description, sort_order = 0 }) {
+    const { data, error } = await supabase
+      .from('topics')
+      .insert({ subject_id, name, description, sort_order })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
 
-  findById(id) {
-    return db.prepare('SELECT * FROM topics WHERE id = ?').get(id);
+  async findBySubject(subjectId) {
+    const { data, error } = await supabase
+      .from('topics')
+      .select('*')
+      .eq('subject_id', subjectId)
+      .order('sort_order', { ascending: true });
+    if (error) throw error;
+    return data || [];
   },
 
-  create(subjectId, name, description = '', orderIndex = 0) {
-    const stmt = db.prepare(`
-      INSERT INTO topics (subject_id, name, description, order_index)
-      VALUES (?, ?, ?, ?)
-    `);
-    const res = stmt.run(subjectId, name.trim(), (description || '').trim(), orderIndex || 0);
-    return this.findById(Number(res.lastInsertRowid));
+  async findById(id) {
+    const { data, error } = await supabase
+      .from('topics')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
   },
 
-  update(id, name, description = '') {
-    db.prepare(`
-      UPDATE topics
-      SET name = ?, description = ?
-      WHERE id = ?
-    `).run(name.trim(), (description || '').trim(), id);
-    return this.findById(id);
+  async delete(id) {
+    const { error } = await supabase.from('topics').delete().eq('id', id);
+    if (error) throw error;
+    return true;
   },
-
-  delete(id) {
-    return db.prepare('DELETE FROM topics WHERE id = ?').run(id);
-  }
 };
 
 module.exports = Topic;
-

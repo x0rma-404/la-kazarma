@@ -1,29 +1,27 @@
-<%- include('partials/head') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Error' %> - La Kazarma</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
 <body>
-<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem">
-  <div style="text-align:center;max-width:480px">
-    <div style="font-size:5rem;line-height:1;margin-bottom:1rem;color:var(--accent);opacity:0.7">
-      <%= code === 404 ? '🔍' : code === 403 ? '🔒' : '⚠' %>
-    </div>
-    <h1 style="font-size:4rem;font-weight:800;color:var(--text-heading);line-height:1;margin-bottom:0.5rem">
-      <%= code %>
-    </h1>
-    <h2 style="color:var(--text-secondary);font-weight:400;margin-bottom:1rem;font-size:1.1rem">
-      <% if (code === 404) { %>Page Not Found
-      <% } else if (code === 403) { %>Access Forbidden
-      <% } else { %>Server Error
-      <% } %>
-    </h2>
-    <p style="color:var(--text-muted);margin-bottom:2rem"><%= message %></p>
-    <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
-      <a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>
-      <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
-    </div>
-    <div style="margin-top:2rem">
-      <span style="font-size:0.75rem;color:var(--text-muted);letter-spacing:0.1em">⚔ LA KAZARMA DE BHOS CE 25</span>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1><%= typeof statusCode !== 'undefined' ? statusCode : 'Error' %></h1>
+        <p><%= typeof message !== 'undefined' ? message : 'Something went wrong.' %></p>
+      </div>
+      <div class="auth-footer">
+        <a href="/dashboard">Go to Dashboard</a>
+      </div>
     </div>
   </div>
-</div>
-<script src="/js/main.js"></script>
 </body>
 </html>

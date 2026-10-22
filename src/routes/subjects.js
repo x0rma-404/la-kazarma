@@ -1,22 +1,14 @@
-'use strict';
-
 const express = require('express');
 const router = express.Router();
-const subjects = require('../controllers/subjectController');
-const { requireAuth, requireApproved, requireAdmin } = require('../middleware/auth');
+const subjectController = require('../controllers/subjectController');
+const auth = require('../middleware/auth');
 
-// Students & Admins
-router.get('/',                      requireAuth, requireApproved, subjects.index);
-router.get('/:id/topics-json',       requireAuth, requireApproved, subjects.getTopicsJson);
-router.get('/:id',                   requireAuth, requireApproved, subjects.show);
-
-// Admin-only management
-router.post('/',                     requireAuth, requireAdmin, subjects.create);
-router.post('/:id/update',           requireAuth, requireAdmin, subjects.update);
-router.post('/:id/archive',          requireAuth, requireAdmin, subjects.toggleArchive);
-router.post('/:id/topics',           requireAuth, requireAdmin, subjects.addTopic);
-router.post('/:id/topics/:topicId/delete', requireAuth, requireAdmin, subjects.deleteTopic);
-router.post('/:id/announcements',    requireAuth, requireAdmin, subjects.addAnnouncement);
+router.get('/', subjectController.index);
+router.get('/:id', subjectController.show);
+router.post('/', auth.requireRole('admin'), subjectController.create);
+router.post('/:id', auth.requireRole('admin'), subjectController.update);
+router.post('/:id/delete', auth.requireRole('admin'), subjectController.delete);
+router.post('/:id/topics', subjectController.createTopic);
+router.post('/:id/topics/:topicId/delete', subjectController.deleteTopic);
 
 module.exports = router;
-

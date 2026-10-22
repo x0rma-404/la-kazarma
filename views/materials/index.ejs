@@ -1,225 +1,49 @@
 <%- include('../partials/head') %>
-<body>
-<div class="app-wrapper">
+<%- include('../partials/mobile-nav') %>
+<div class="app-layout">
   <%- include('../partials/sidebar') %>
-  <%- include('../partials/mobile-nav') %>
-
   <main class="main-content">
     <%- include('../partials/flash') %>
-
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem">
+    <div class="page-header">
       <div>
-        <h1>📚 Study Materials</h1>
-        <p>Lecture slides, notes, reference documents, and study guides shared by BHOS CE 25 students.</p>
+        <h1>Materials</h1>
+        <p class="page-subtitle">All study materials across subjects</p>
       </div>
       <a href="/materials/upload" class="btn btn-primary">
-        + Upload Material
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Upload
       </a>
     </div>
 
-    <!-- Filter & Search Controls -->
-    <div class="card" style="margin-bottom:1.5rem;padding:1.25rem">
-      <form method="GET" action="/materials" id="filter-form">
-        <!-- Top search row -->
-        <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap">
-          <div style="flex:3;min-width:240px">
-            <input type="text" name="search" class="form-control" placeholder="Search by title, description, tags, or subject name..." value="<%= filters.search || '' %>">
-          </div>
-          <div style="flex:1;min-width:160px">
-            <select name="sort" class="form-control" onchange="this.form.submit()">
-              <option value="newest" <%= filters.sort === 'newest' ? 'selected' : '' %>>Newest First</option>
-              <option value="oldest" <%= filters.sort === 'oldest' ? 'selected' : '' %>>Oldest First</option>
-              <option value="title" <%= filters.sort === 'title' ? 'selected' : '' %>>Title (A-Z)</option>
-            </select>
-          </div>
-          <div style="display:flex;gap:0.5rem">
-            <button type="submit" class="btn btn-secondary">Search</button>
-            <a href="/materials" class="btn btn-ghost">Reset</a>
-          </div>
-        </div>
-
-        <!-- Filter dropdowns row -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem">
-          <div>
-            <label class="form-label" style="font-size:0.75rem;text-transform:uppercase">Subject</label>
-            <select name="subject_id" id="subject-filter-select" class="form-control" onchange="handleSubjectChange(this.value)">
-              <option value="">All Subjects</option>
-              <% subjects.forEach(s => { %>
-                <option value="<%= s.id %>" <%= filters.subjectId === s.id ? 'selected' : '' %>>
-                  <%= s.code ? s.code + ' – ' : '' %><%= s.name %>
-                </option>
-              <% }); %>
-            </select>
-          </div>
-
-          <div>
-            <label class="form-label" style="font-size:0.75rem;text-transform:uppercase">Topic</label>
-            <select name="topic_id" id="topic-filter-select" class="form-control" onchange="this.form.submit()">
-              <option value="">All Topics</option>
-              <% topics.forEach(t => { %>
-                <option value="<%= t.id %>" <%= filters.topicId === t.id ? 'selected' : '' %>><%= t.name %></option>
-              <% }); %>
-            </select>
-          </div>
-
-          <div>
-            <label class="form-label" style="font-size:0.75rem;text-transform:uppercase">Category</label>
-            <select name="category" class="form-control" onchange="this.form.submit()">
-              <option value="">All Categories</option>
-              <% categories.forEach(c => { %>
-                <option value="<%= c %>" <%= filters.category === c ? 'selected' : '' %>><%= c %></option>
-              <% }); %>
-            </select>
-          </div>
-
-          <div>
-            <label class="form-label" style="font-size:0.75rem;text-transform:uppercase">File Format</label>
-            <select name="file_type" class="form-control" onchange="this.form.submit()">
-              <option value="">All File Types</option>
-              <% fileTypes.forEach(ft => { %>
-                <option value="<%= ft %>" <%= filters.fileType === ft ? 'selected' : '' %>><%= ft.toUpperCase() %></option>
-              <% }); %>
-            </select>
-          </div>
-        </div>
-      </form>
-    </div>
-
-    <!-- Results Count -->
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;font-size:0.875rem;color:var(--text-muted)">
-      <span>Found <strong><%= totalMaterials %></strong> material<%= totalMaterials === 1 ? '' : 's' %></span>
-      <span>Page <%= currentPage %> of <%= totalPages %></span>
-    </div>
-
-    <!-- Materials Grid -->
-    <% if (materials.length > 0) { %>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:1.25rem;margin-bottom:2rem">
-        <% materials.forEach(m => { %>
-          <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;position:relative">
-            <div>
-              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;margin-bottom:0.5rem">
-                <span class="badge badge-student" style="font-size:0.75rem"><%= m.category %></span>
-                <div style="display:flex;align-items:center;gap:0.4rem">
-                  <span class="badge badge-outline" style="text-transform:uppercase;font-size:0.7rem"><%= m.file_type %></span>
-                  <form method="POST" action="/materials/<%= m.id %>/bookmark" style="margin:0">
-                    <button type="submit" class="btn btn-ghost btn-sm" title="Bookmark" style="padding:0.15rem 0.4rem;font-size:0.9rem">
-                      <%= m.bookmarks_count > 0 ? '🔖' : '🏷' %>
-                    </button>
-                  </form>
-                </div>
-              </div>
-
-              <h3 style="font-size:1.1rem;margin:0 0 0.4rem">
-                <a href="/materials/<%= m.id %>" style="color:var(--text-heading);text-decoration:none">
-                  <%= m.title %>
-                </a>
-              </h3>
-
-              <div style="font-size:0.8rem;color:var(--accent-light);font-weight:500;margin-bottom:0.5rem">
-                <%= m.subject_code ? m.subject_code + ' · ' : '' %><%= m.subject_name %>
-                <% if (m.topic_name) { %>
-                  <span style="color:var(--text-muted)"> › <%= m.topic_name %></span>
-                <% } %>
-              </div>
-
-              <% if (m.description) { %>
-                <p style="color:var(--text-secondary);font-size:0.85rem;line-height:1.5;margin-bottom:0.75rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">
-                  <%= m.description %>
-                </p>
-              <% } %>
-            </div>
-
-            <div>
-              <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:var(--text-muted);padding-top:0.6rem;border-top:1px solid var(--border);margin-bottom:0.75rem">
-                <span>By <strong><%= m.uploader_name %></strong></span>
-                <span><%= formatBytes(m.file_size) %></span>
-              </div>
-
-              <div style="display:flex;gap:0.5rem">
-                <a href="/materials/<%= m.id %>" class="btn btn-ghost btn-sm" style="flex:1;text-align:center">
-                  Preview & Details
-                </a>
-                <a href="/materials/<%= m.id %>/download" class="btn btn-primary btn-sm" style="display:inline-flex;align-items:center;gap:0.3rem">
-                  ⬇ Download
-                </a>
-              </div>
-            </div>
-          </div>
-        <% }); %>
+    <% if (materials.length === 0) { %>
+      <div class="empty-state-card">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <h3>No materials yet</h3>
+        <p>Upload study materials to share with the group.</p>
+        <a href="/materials/upload" class="btn btn-primary">Upload Material</a>
       </div>
-
-      <!-- Pagination -->
-      <% if (totalPages > 1) { %>
-        <div style="display:flex;justify-content:center;gap:0.4rem;margin:2rem 0">
-          <% if (currentPage > 1) { %>
-            <a href="/materials?page=<%= currentPage - 1 %>&<%= new URLSearchParams({ ...filters, page: undefined }).toString() %>" class="btn btn-secondary btn-sm">
-              ← Prev
-            </a>
-          <% } %>
-
-          <% for (let p = 1; p <= totalPages; p++) { %>
-            <a href="/materials?page=<%= p %>&<%= new URLSearchParams({ ...filters, page: undefined }).toString() %>"
-              class="btn <%= currentPage === p ? 'btn-primary' : 'btn-ghost' %> btn-sm" style="min-width:36px;text-align:center">
-              <%= p %>
-            </a>
-          <% } %>
-
-          <% if (currentPage < totalPages) { %>
-            <a href="/materials?page=<%= currentPage + 1 %>&<%= new URLSearchParams({ ...filters, page: undefined }).toString() %>" class="btn btn-secondary btn-sm">
-              Next →
-            </a>
-          <% } %>
-        </div>
-      <% } %>
-
     <% } else { %>
-      <div class="card" style="text-align:center;padding:3rem 1.5rem">
-        <span style="font-size:3rem">📚</span>
-        <h3 style="margin-top:1rem;color:var(--text-heading)">No materials found</h3>
-        <p style="color:var(--text-muted);max-width:400px;margin:0.5rem auto 1.5rem">
-          No study files matched your current search and filter settings.
-        </p>
-        <div style="display:flex;justify-content:center;gap:0.75rem">
-          <a href="/materials" class="btn btn-secondary">Clear Filters</a>
-          <a href="/materials/upload" class="btn btn-primary">+ Upload Material</a>
-        </div>
+      <div class="materials-list">
+        <% materials.forEach(function(m) { %>
+          <a href="/materials/<%= m.id %>" class="material-row">
+            <div class="material-row-icon <%= bookmarkedIds.includes(m.id) ? 'material-row-icon-gold' : '' %>">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="material-row-info">
+              <strong><%= m.title %></strong>
+              <span>
+                <%= m.subject ? m.subject.name : '' %>
+                <% if (m.topic) { %> - <%= m.topic.name %><% } %>
+                <% if (m.file_type) { %> - <%= m.file_type.toUpperCase() %><% } %>
+              </span>
+            </div>
+            <span class="material-row-date"><%= new Date(m.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %></span>
+          </a>
+        <% }) %>
       </div>
     <% } %>
-
   </main>
 </div>
-
-<script>
-  async function handleSubjectChange(subjectId) {
-    const topicSelect = document.getElementById('topic-filter-select');
-    topicSelect.innerHTML = '<option value="">All Topics</option>';
-
-    if (!subjectId) {
-      document.getElementById('filter-form').submit();
-      return;
-    }
-
-    try {
-      const resp = await fetch(`/subjects/${subjectId}/topics-json`);
-      const data = await resp.json();
-      if (data.success && data.topics) {
-        data.topics.forEach(t => {
-          const opt = document.createElement('option');
-          opt.value = t.id;
-          opt.textContent = t.name;
-          topicSelect.appendChild(opt);
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-
-    document.getElementById('filter-form').submit();
-  }
-</script>
-
 <script src="/js/sidebar.js"></script>
-<script src="/js/main.js"></script>
 </body>
 </html>
-

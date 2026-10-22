@@ -1,10 +1,7 @@
-'use strict';
-
 const express = require('express');
 const router = express.Router();
-const dashboard = require('../controllers/dashboardController');
-const { requireAuth, requireApproved } = require('../middleware/auth');
+const dashboardController = require('../controllers/dashboardController');
 
-router.get('/', requireAuth, requireApproved, dashboard.index);
+router.get('/', dashboardController.index);
 
 module.exports = router;

@@ -1,18 +1,20 @@
-'use strict';
-
 const express = require('express');
 const router = express.Router();
-const auth = require('../controllers/authController');
-const { redirectIfLoggedIn } = require('../middleware/auth');
+const authController = require('../controllers/authController');
 
-router.get('/login',           redirectIfLoggedIn, auth.showLogin);
-router.post('/login',          redirectIfLoggedIn, auth.login);
-router.get('/register',        redirectIfLoggedIn, auth.showRegister);
-router.post('/register',       redirectIfLoggedIn, auth.register);
-router.get('/forgot-password', redirectIfLoggedIn, auth.showForgotPassword);
-router.post('/forgot-password',redirectIfLoggedIn, auth.forgotPassword);
-router.get('/reset-password',  auth.showResetPassword);
-router.post('/reset-password', auth.resetPassword);
-router.post('/logout',         auth.logout);
+router.get('/register', authController.getRegister);
+router.post('/register', authController.postRegister);
+router.get('/login', authController.getLogin);
+router.post('/login', authController.postLogin);
+router.get('/logout', authController.logout);
+router.get('/forgot-password', authController.getForgotPassword);
+router.post('/forgot-password', authController.postForgotPassword);
+router.get('/reset-password', authController.getResetPassword);
+router.post('/reset-password', authController.postResetPassword);
+
+router.get('/', (req, res) => {
+  if (req.session.user) return res.redirect('/dashboard');
+  res.redirect('/login');
+});
 
 module.exports = router;

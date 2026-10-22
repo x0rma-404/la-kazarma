@@ -1,28 +1,36 @@
-'use strict';
-
-const db = require('../config/database');
+const supabase = require('../config/database');
 
 const Setting = {
-  get(key, defaultValue = null) {
-    const row = db.prepare('SELECT value FROM platform_settings WHERE key = ?').get(key);
-    return row ? row.value : defaultValue;
+  async get(key, defaultValue = null) {
+    const { data, error } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', key)
+      .maybeSingle();
+    if (error) throw error;
+    return data ? data.value : defaultValue;
   },
 
-  set(key, value) {
-    db.prepare(`
-      INSERT INTO platform_settings (key, value)
-      VALUES (?, ?)
-      ON CONFLICT(key) DO UPDATE SET value = excluded.value
-    `).run(key, String(value));
+  async set(key, value) {
+    const { data, error } = await supabase
+      .from('settings')
+      .upsert({ key, value, updated_at: new Date().toISOString() })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
 
-  getAll() {
-    const rows = db.prepare('SELECT key, value FROM platform_settings').all();
+  async getAll() {
+    const { data, error } = await supabase
+      .from('settings')
+      .select('key, value')
+      .order('key', { ascending: true });
+    if (error) throw error;
     const result = {};
-    rows.forEach(r => result[r.key] = r.value);
+    (data || []).forEach((s) => { result[s.key] = s.value; });
     return result;
-  }
+  },
 };
 
 module.exports = Setting;
-

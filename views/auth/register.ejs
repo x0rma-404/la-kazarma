@@ -1,88 +1,67 @@
-<%- include('../partials/head', { extraCss: ['/css/auth.css'] }) %>
-<body class="auth-page">
-  <div class="auth-container">
-
-    <!-- Emblem -->
-    <div class="auth-emblem">
-      <div class="auth-emblem-icon">⚔</div>
-      <h1>La Kazarma de BHOS CE 25</h1>
-      <p class="auth-subtitle">Create Your Account</p>
-    </div>
-
-    <!-- Flash -->
-    <%- include('../partials/flash') %>
-
-    <!-- Card -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - La Kazarma</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+  <div class="auth-wrapper">
     <div class="auth-card">
-      <h2 class="auth-card-title">Register</h2>
-      <p class="auth-card-desc">Fill in your details to request access to the workspace.</p>
+      <div class="auth-header">
+        <svg width="48" height="48" viewBox="0 0 32 32" fill="none">
+          <rect width="32" height="32" rx="8" fill="#1e6b5c"/>
+          <path d="M8 22V10l8 6 8-6v12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1>Join La Kazarma</h1>
+        <p>You need an invitation code to register</p>
+      </div>
 
-      <form method="POST" action="/register" autocomplete="off">
+      <% if (success && success.length > 0) { %>
+        <div class="flash flash-success">
+          <% success.forEach(function(msg) { %><span><%= msg %></span><% }) %>
+        </div>
+      <% } %>
+      <% if (error && error.length > 0) { %>
+        <div class="flash flash-error">
+          <% error.forEach(function(msg) { %><span><%= msg %></span><% }) %>
+        </div>
+      <% } %>
 
+      <form action="/register" method="POST" class="auth-form">
         <div class="form-group">
-          <label class="form-label" for="full_name">Full Name</label>
-          <input class="form-control" type="text" id="full_name" name="full_name"
-            placeholder="e.g. Aytaj Mammadova" required autofocus>
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" placeholder="Your name" required autofocus>
         </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="username">Username</label>
-            <input class="form-control" type="text" id="username" name="username"
-              placeholder="aytaj" pattern="[a-zA-Z0-9_]{3,20}" required>
-            <span class="form-hint">3–20 chars, letters/numbers/underscore</span>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="student_code">Student Code</label>
-            <input class="form-control" type="text" id="student_code" name="student_code"
-              placeholder="CE25-001" required>
-          </div>
-        </div>
-
         <div class="form-group">
-          <label class="form-label" for="email">Email Address</label>
-          <input class="form-control" type="email" id="email" name="email"
-            placeholder="you@bhos.edu.az" required>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required>
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="invitation_code">Invitation Code</label>
-          <input class="form-control" type="text" id="invitation_code" name="invitation_code"
-            placeholder="BHOS-XXXX-XXXX" style="letter-spacing:0.05em">
-          <span class="form-hint">Optional — but required for instant approval</span>
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="At least 6 characters" required minlength="6">
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="password">Password</label>
-          <input class="form-control" type="password" id="password" name="password"
-            placeholder="At least 8 characters" required minlength="8"
-            autocomplete="new-password">
-          <div class="password-strength">
-            <div class="password-strength-bar" id="strength-bar"></div>
-          </div>
-          <span class="strength-label" id="strength-label"></span>
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repeat your password" required>
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="confirm_password">Confirm Password</label>
-          <input class="form-control" type="password" id="confirm_password" name="confirm_password"
-            placeholder="Repeat your password" required autocomplete="new-password">
+          <label for="invitationCode">Invitation Code</label>
+          <input type="text" id="invitationCode" name="invitationCode" placeholder="Enter your invitation code" required>
         </div>
-
-        <button type="submit" class="btn btn-primary btn-block btn-lg">
-          Create Account
-        </button>
+        <button type="submit" class="btn btn-primary btn-block">Create Account</button>
       </form>
 
-      <div class="auth-links" style="margin-top:1rem">
-        Already have an account? <a href="/login">Sign In</a>
+      <div class="auth-footer">
+        <p>Already have an account? <a href="/login">Sign in</a></p>
       </div>
     </div>
-
-    <p class="auth-notice">Access restricted to BHOS CE25 members</p>
   </div>
-
-  <script src="/js/sidebar.js"></script>
-  <script src="/js/main.js"></script>
 </body>
 </html>

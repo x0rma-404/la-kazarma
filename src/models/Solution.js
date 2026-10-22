@@ -1,77 +1,57 @@
-'use strict';
-
-const db = require('../config/database');
+const supabase = require('../config/database');
 
 const Solution = {
-  findByAssignmentId(assignmentId) {
-    return db.prepare(`
-      SELECT sol.*,
-             u.full_name AS student_name,
-             u.username AS student_username,
-             u.student_code AS student_code
-      FROM solutions sol
-      JOIN users u ON sol.student_id = u.id
-      WHERE sol.assignment_id = ?
-      ORDER BY sol.created_at DESC
-    `).all(assignmentId);
+  async create({ assignment_id, user_id, content, file_url }) {
+    const { data, error } = await supabase
+      .from('solutions')
+      .insert({ assignment_id, user_id, content, file_url })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
 
-  findById(id) {
-    return db.prepare(`
-      SELECT sol.*,
-             u.full_name AS student_name,
-             u.username AS student_username,
-             u.student_code AS student_code,
-             a.title AS assignment_title,
-             a.id AS assignment_id
-      FROM solutions sol
-      JOIN users u ON sol.student_id = u.id
-      JOIN assignments a ON sol.assignment_id = a.id
-      WHERE sol.id = ?
-    `).get(id);
+  async findByAssignment(assignmentId) {
+    const { data, error } = await supabase
+      .from('solutions')
+      .select('*, user:users!solutions_user_id_fkey(id,name)')
+      .eq('assignment_id', assignmentId)
+      .order('submitted_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
   },
 
-  findByStudentAndAssignment(studentId, assignmentId) {
-    return db.prepare(`
-      SELECT * FROM solutions
-      WHERE student_id = ? AND assignment_id = ?
-    `).all(studentId, assignmentId);
+  async findByUser(userId) {
+    const { data, error } = await supabase
+      .from('solutions')
+      .select('*, assignment:assignments(id,title,subject:subjects(id,name))')
+      .eq('user_id', userId)
+      .order('submitted_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
   },
 
-  create(data) {
-    const stmt = db.prepare(`
-      INSERT INTO solutions (
-        assignment_id, student_id, title, notes,
-        file_path, file_name, original_name, file_type, file_size
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    const res = stmt.run(
-      data.assignment_id,
-      data.student_id,
-      data.title.trim(),
-      (data.notes || '').trim(),
-      data.file_path,
-      data.file_name,
-      data.original_name,
-      data.file_type.toLowerCase(),
-      data.file_size
-    );
-    return this.findById(Number(res.lastInsertRowid));
+  async findByAssignmentAndUser(assignmentId, userId) {
+    const { data, error } = await supabase
+      .from('solutions')
+      .select('*')
+      .eq('assignment_id', assignmentId)
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
   },
 
-  delete(id) {
-    return db.prepare('DELETE FROM solutions WHERE id = ?').run(id);
+  async grade(id, score, feedback) {
+    const { data, error } = await supabase
+      .from('solutions')
+      .update({ score, feedback })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
-
-  countAll() {
-    return db.prepare('SELECT COUNT(*) as n FROM solutions').get().n;
-  },
-
-  countByStudent(studentId) {
-    return db.prepare('SELECT COUNT(*) as n FROM solutions WHERE student_id = ?').get(studentId).n;
-  }
 };
 
 module.exports = Solution;
-

@@ -1,31 +1,8 @@
-<!-- Mobile top bar -->
-<header class="mobile-topbar">
-  <button class="hamburger-btn" id="hamburger-btn" aria-label="Open navigation">
-    ☰
+<header class="mobile-nav">
+  <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
   </button>
-  <span class="topbar-logo">⚔ KAZARMA</span>
+  <a href="/dashboard" class="mobile-nav-logo">La Kazarma</a>
+  <div></div>
 </header>
-
-<!-- Mobile bottom navigation -->
-<nav class="mobile-bottom-nav" aria-label="Mobile navigation">
-  <a href="/dashboard">
-    <span class="icon">🏠</span>
-    <span>Home</span>
-  </a>
-  <a href="/subjects">
-    <span class="icon">🏛</span>
-    <span>Subjects</span>
-  </a>
-  <a href="/materials">
-    <span class="icon">📚</span>
-    <span>Materials</span>
-  </a>
-  <a href="/assignments">
-    <span class="icon">📝</span>
-    <span>Tasks</span>
-  </a>
-  <a href="/profile">
-    <span class="icon">👤</span>
-    <span>Profile</span>
-  </a>
-</nav>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
