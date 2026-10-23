@@ -10,7 +10,7 @@
 
     <div class="card">
       <div class="card-body">
-        <form action="/assignments/new" method="POST" class="auth-form">
+        <form action="/assignments/new" method="POST" enctype="multipart/form-data" class="auth-form">
           <div class="form-group">
             <label for="title">Title</label>
             <input type="text" id="title" name="title" required placeholder="Assignment title">
@@ -30,13 +30,21 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="due_date">Due Date</label>
-              <input type="datetime-local" id="due_date" name="due_date">
+              <label for="deadline_date">Due Date</label>
+              <input type="date" id="deadline_date" name="deadline_date">
             </div>
             <div class="form-group">
-              <label for="max_score">Max Score</label>
-              <input type="number" id="max_score" name="max_score" value="100" min="1">
+              <label for="deadline_time">Due Time</label>
+              <input type="time" id="deadline_time" name="deadline_time" value="23:59">
             </div>
+          </div>
+          <div class="form-group">
+            <label for="tags">Tags</label>
+            <input type="text" id="tags" name="tags" placeholder="Comma-separated tags (optional)">
+          </div>
+          <div class="form-group">
+            <label for="file">Attach Specification File (optional)</label>
+            <input type="file" id="file" name="file">
           </div>
           <div class="form-actions">
             <a href="/assignments" class="btn btn-secondary">Cancel</a>

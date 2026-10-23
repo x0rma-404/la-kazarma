@@ -10,6 +10,7 @@
         <p class="page-subtitle">
           <% if (subject.code) { %><span class="badge"><%= subject.code %></span><% } %>
           <% if (subject.semester) { %> Semester <%= subject.semester %><% } %>
+          <% if (subject.academic_year) { %> - <%= subject.academic_year %><% } %>
         </p>
       </div>
       <div class="page-header-actions">
@@ -17,9 +18,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Upload Material
         </a>
-        <% if (user.role === 'admin') { %>
-          <a href="/assignments/new" class="btn btn-secondary">New Assignment</a>
-        <% } %>
+        <a href="/assignments/new" class="btn btn-secondary">New Assignment</a>
       </div>
     </div>
 
@@ -35,6 +34,7 @@
       <button class="tab active" data-tab="materials">Materials</button>
       <button class="tab" data-tab="assignments">Assignments</button>
       <button class="tab" data-tab="topics">Topics</button>
+      <button class="tab" data-tab="announcements">Announcements</button>
     </div>
 
     <div class="tab-content active" id="tab-materials">
@@ -83,6 +83,7 @@
         <form action="/subjects/<%= subject.id %>/topics" method="POST" class="inline-form">
           <input type="text" name="name" placeholder="Topic name" required>
           <input type="text" name="description" placeholder="Description (optional)">
+          <input type="number" name="order_index" placeholder="Order" min="0" value="0" style="width:80px">
           <button type="submit" class="btn btn-primary">Add Topic</button>
         </form>
 
@@ -102,6 +103,45 @@
           </div>
         <% } else { %>
           <p class="empty-state">No topics added yet.</p>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-announcements">
+      <div class="topics-section">
+        <% if (user.role === 'admin') { %>
+          <form action="/subjects/<%= subject.id %>/announcements" method="POST" class="auth-form" style="max-width:600px">
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" name="title" placeholder="Announcement title" required>
+            </div>
+            <div class="form-group">
+              <label>Content</label>
+              <textarea name="content" rows="3" placeholder="Announcement content"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post Announcement</button>
+          </form>
+        <% } %>
+
+        <% if (subject.announcements && subject.announcements.length > 0) { %>
+          <div class="topics-list">
+            <% subject.announcements.forEach(function(a) { %>
+              <div class="topic-row">
+                <div>
+                  <strong><%= a.title %></strong>
+                  <p><%= a.content %></p>
+                  <span class="text-muted">Posted by <%= a.created_by_user ? a.created_by_user.name : 'Admin' %> on <%= new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></span>
+                </div>
+                <% if (user.role === 'admin') { %>
+                  <form action="/subjects/<%= subject.id %>/announcements/<%= a.id %>/delete" method="POST" onsubmit="return confirm('Delete this announcement?')">
+                    <button type="submit" class="btn btn-ghost btn-sm">Delete</button>
+                  </form>
+                <% } %>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <p class="empty-state">No announcements yet.</p>
         <% } %>
       </div>
     </div>

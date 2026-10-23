@@ -36,8 +36,16 @@
 
       <form action="/register" method="POST" class="auth-form">
         <div class="form-group">
-          <label for="name">Full Name</label>
-          <input type="text" id="name" name="name" placeholder="Your name" required autofocus>
+          <label for="full_name">Full Name</label>
+          <input type="text" id="full_name" name="full_name" placeholder="Your full name" required autofocus>
+        </div>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Choose a username" required>
+        </div>
+        <div class="form-group">
+          <label for="student_code">Student Code</label>
+          <input type="text" id="student_code" name="student_code" placeholder="e.g. BHOS-CE-042">
         </div>
         <div class="form-group">
           <label for="email">Email</label>
@@ -48,12 +56,12 @@
           <input type="password" id="password" name="password" placeholder="At least 6 characters" required minlength="6">
         </div>
         <div class="form-group">
-          <label for="confirmPassword">Confirm Password</label>
-          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repeat your password" required>
+          <label for="confirm_password">Confirm Password</label>
+          <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat your password" required>
         </div>
         <div class="form-group">
-          <label for="invitationCode">Invitation Code</label>
-          <input type="text" id="invitationCode" name="invitationCode" placeholder="Enter your invitation code" required>
+          <label for="invitation_code">Invitation Code</label>
+          <input type="text" id="invitation_code" name="invitation_code" placeholder="Enter your invitation code" required>
         </div>
         <button type="submit" class="btn btn-primary btn-block">Create Account</button>
       </form>

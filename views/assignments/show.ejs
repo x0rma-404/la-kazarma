@@ -27,7 +27,13 @@
           <p><%= assignment.description %></p>
           <div class="assignment-meta">
             <span>Max score: <strong><%= assignment.max_score || 100 %></strong></span>
+            <% if (assignment.tags) { %><span>Tags: <strong><%= assignment.tags %></strong></span><% } %>
           </div>
+          <% if (assignment.file_url) { %>
+            <div class="material-actions" style="margin-top:12px">
+              <a href="<%= assignment.file_url %>" download class="btn btn-secondary">Download Specification</a>
+            </div>
+          <% } %>
         </div>
       </div>
     <% } %>
@@ -45,9 +51,10 @@
             <div>
               <strong>Solution Submitted</strong>
               <p>Submitted on <%= new Date(mySolution.submitted_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></p>
-              <% if (mySolution.content) { %><p><%= mySolution.content %></p><% } %>
+              <% if (mySolution.title) { %><p><strong><%= mySolution.title %></strong></p><% } %>
+              <% if (mySolution.notes) { %><p><%= mySolution.notes %></p><% } %>
               <% if (mySolution.file_url) { %>
-                <p><a href="<%= mySolution.file_url %>" download class="btn btn-secondary btn-sm">Download your submission</a></p>
+                <p><a href="/assignments/solutions/<%= mySolution.id %>/download" class="btn btn-secondary btn-sm">Download your submission</a></p>
               <% } %>
               <% if (mySolution.score !== null && mySolution.score !== undefined) { %>
                 <div class="solution-grade">
@@ -60,13 +67,17 @@
             </div>
           </div>
         <% } else { %>
-          <form action="/assignments/<%= assignment.id %>/solution" method="POST" enctype="multipart/form-data" class="auth-form">
+          <form action="/assignments/<%= assignment.id %>/solutions" method="POST" enctype="multipart/form-data" class="auth-form">
             <div class="form-group">
-              <label for="content">Your Answer</label>
-              <textarea id="content" name="content" rows="5" placeholder="Write your solution here..."></textarea>
+              <label for="title">Solution Title</label>
+              <input type="text" id="title" name="title" placeholder="Give your solution a title">
             </div>
             <div class="form-group">
-              <label for="file">Attach File (optional)</label>
+              <label for="notes">Notes</label>
+              <textarea id="notes" name="notes" rows="4" placeholder="Describe your approach..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="file">Attach File</label>
               <input type="file" id="file" name="file">
             </div>
             <button type="submit" class="btn btn-primary">Submit Solution</button>
@@ -86,8 +97,9 @@
               <div class="submission-info">
                 <strong><%= s.user ? s.user.name : 'Unknown' %></strong>
                 <span><%= new Date(s.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
-                <% if (s.content) { %><p><%= s.content.substring(0, 200) %></p><% } %>
-                <% if (s.file_url) { %><a href="<%= s.file_url %>" download class="btn btn-ghost btn-sm">Download file</a><% } %>
+                <% if (s.title) { %><p><strong><%= s.title %></strong></p><% } %>
+                <% if (s.notes) { %><p><%= s.notes %></p><% } %>
+                <% if (s.file_url) { %><a href="/assignments/solutions/<%= s.id %>/download" class="btn btn-ghost btn-sm">Download file</a><% } %>
               </div>
               <div class="submission-grade">
                 <% if (s.score !== null && s.score !== undefined) { %>

@@ -24,8 +24,8 @@
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         </div>
         <div class="stat-info">
-          <span class="stat-value"><%= stats.materials %></span>
-          <span class="stat-label">Materials</span>
+          <span class="stat-value"><%= stats.uploads %></span>
+          <span class="stat-label">Your Uploads</span>
         </div>
       </div>
       <div class="stat-card">
@@ -39,11 +39,11 @@
       </div>
       <div class="stat-card">
         <div class="stat-icon stat-icon-rose">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
         </div>
         <div class="stat-info">
-          <span class="stat-value"><%= stats.members %></span>
-          <span class="stat-label">Members</span>
+          <span class="stat-value"><%= stats.bookmarks %></span>
+          <span class="stat-label">Bookmarks</span>
         </div>
       </div>
     </div>
@@ -51,15 +51,15 @@
     <div class="dashboard-grid">
       <div class="card">
         <div class="card-header">
-          <h2>Recent Materials</h2>
+          <h2>Your Uploads</h2>
           <a href="/materials" class="card-link">View all</a>
         </div>
         <div class="card-body">
-          <% if (recentMaterials.length === 0) { %>
-            <p class="empty-state">No materials uploaded yet.</p>
+          <% if (!myUploads || myUploads.length === 0) { %>
+            <p class="empty-state">You haven't uploaded any materials yet.</p>
           <% } else { %>
             <div class="list-items">
-              <% recentMaterials.forEach(function(m) { %>
+              <% myUploads.forEach(function(m) { %>
                 <a href="/materials/<%= m.id %>" class="list-item">
                   <div class="list-item-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
