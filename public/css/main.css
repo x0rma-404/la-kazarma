@@ -1,48 +1,48 @@
 :root {
-  --primary-50: #f0f9f6;
-  --primary-100: #ccf0e6;
-  --primary-200: #99e0cc;
-  --primary-300: #5fc9aa;
-  --primary-400: #2eab8a;
-  --primary-500: #1e6b5c;
-  --primary-600: #185a4d;
-  --primary-700: #134740;
-  --primary-800: #0d3733;
-  --primary-900: #082724;
+  --primary-50: #f4f7ed;
+  --primary-100: #e5ecd2;
+  --primary-200: #cbd9a5;
+  --primary-300: #a4b868;
+  --primary-400: #8a9d52;
+  --primary-500: #6b7c3e;
+  --primary-600: #586a32;
+  --primary-700: #475728;
+  --primary-800: #374420;
+  --primary-900: #2a321a;
 
-  --accent-50: #fef9e7;
-  --accent-100: #fdf0c4;
-  --accent-200: #fbe088;
-  --accent-300: #f9cc4b;
-  --accent-400: #f7b820;
-  --accent-500: #d99e15;
+  --accent-50: #f8f6ee;
+  --accent-100: #ece6cf;
+  --accent-200: #d9cda0;
+  --accent-300: #c4b470;
+  --accent-400: #b09e4e;
+  --accent-500: #8a7d3a;
 
   --blue-50: #eef5ff;
   --blue-100: #d9e8ff;
-  --blue-500: #2c6cd4;
-  --blue-600: #1d5bb8;
+  --blue-500: #5b7a9e;
+  --blue-600: #4a6885;
 
   --success-50: #f0fdf4;
-  --success-500: #22c55e;
-  --success-600: #16a34a;
+  --success-500: #5a8c3e;
+  --success-600: #4a7532;
 
   --warning-50: #fefce8;
-  --warning-500: #eab308;
+  --warning-500: #b09e4e;
 
   --error-50: #fef2f2;
-  --error-500: #ef4444;
-  --error-600: #dc2626;
+  --error-500: #b85c5c;
+  --error-600: #a04a4a;
 
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-400: #9ca3af;
-  --gray-500: #6b7280;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
+  --gray-50: #f8f8f5;
+  --gray-100: #eeeee8;
+  --gray-200: #dddcd3;
+  --gray-300: #c4c3b5;
+  --gray-400: #9a9888;
+  --gray-500: #73726a;
+  --gray-600: #54534d;
+  --gray-700: #3a3a35;
+  --gray-800: #252a1d;
+  --gray-900: #1c1f17;
 
   --white: #ffffff;
 
@@ -73,7 +73,7 @@ html {
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--gray-50);
-  color: var(--gray-800);
+  color: var(--gray-700);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }

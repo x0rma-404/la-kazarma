@@ -4,8 +4,8 @@
   left: 0;
   width: var(--sidebar-width);
   height: 100vh;
-  background: var(--white);
-  border-right: 1px solid var(--gray-100);
+  background: #1c1f17;
+  border-right: 1px solid #2a321a;
   display: flex;
   flex-direction: column;
   z-index: 100;
@@ -14,7 +14,7 @@
 
 .sidebar-header {
   padding: 20px 24px;
-  border-bottom: 1px solid var(--gray-100);
+  border-bottom: 1px solid #2a321a;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -26,11 +26,11 @@
   gap: 10px;
   font-weight: 700;
   font-size: 1.1rem;
-  color: var(--gray-900);
+  color: #a4b868;
 }
 
 .sidebar-logo:hover {
-  color: var(--gray-900);
+  color: #cbd9a5;
 }
 
 .sidebar-close {
@@ -38,7 +38,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--gray-400);
+  color: #9a9888;
   padding: 4px;
 }
 
@@ -56,28 +56,28 @@
   border-radius: var(--radius-sm);
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--gray-600);
+  color: #9a9888;
   transition: all var(--transition);
   margin-bottom: 2px;
 }
 
 .nav-item:hover {
-  background: var(--gray-50);
-  color: var(--gray-900);
+  background: #252a1d;
+  color: #d6dad0;
 }
 
 .nav-item.active {
-  background: var(--primary-50);
-  color: var(--primary-600);
+  background: #2a321a;
+  color: #a4b868;
 }
 
 .nav-item.active svg {
-  color: var(--primary-500);
+  color: #a4b868;
 }
 
 .sidebar-footer {
   padding: 16px 12px;
-  border-top: 1px solid var(--gray-100);
+  border-top: 1px solid #2a321a;
 }
 
 .sidebar-user {
@@ -92,8 +92,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--primary-100);
-  color: var(--primary-600);
+  background: #2a321a;
+  color: #a4b868;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -118,7 +118,7 @@
 .sidebar-user-info strong {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--gray-800);
+  color: #d6dad0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -126,17 +126,17 @@
 
 .sidebar-user-info span {
   font-size: 0.75rem;
-  color: var(--gray-400);
+  color: #73726a;
   text-transform: capitalize;
 }
 
 .logout-btn {
-  color: var(--error-500);
+  color: #b85c5c;
 }
 
 .logout-btn:hover {
-  background: var(--error-50);
-  color: var(--error-600);
+  background: rgba(184, 92, 92, 0.15);
+  color: #d97777;
 }
 
 /* Mobile nav */
@@ -147,8 +147,8 @@
   left: 0;
   right: 0;
   height: 56px;
-  background: var(--white);
-  border-bottom: 1px solid var(--gray-100);
+  background: #1c1f17;
+  border-bottom: 1px solid #2a321a;
   z-index: 90;
   align-items: center;
   justify-content: space-between;
@@ -159,7 +159,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--gray-700);
+  color: #9a9888;
   padding: 4px;
   display: flex;
   align-items: center;
@@ -168,7 +168,10 @@
 .mobile-nav-logo {
   font-weight: 700;
   font-size: 1rem;
-  color: var(--gray-900);
+  color: #a4b868;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .sidebar-overlay {
