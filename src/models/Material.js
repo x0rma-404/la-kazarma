@@ -1,10 +1,10 @@
 const supabase = require('../config/database');
 
 const Material = {
-  async create({ subject_id, topic_id, title, description, file_url, file_type, file_size, uploaded_by }) {
+  async create({ subject_id, topic_id, title, description, file_url, file_type, file_size, uploaded_by, category, tags }) {
     const { data, error } = await supabase
       .from('materials')
-      .insert({ subject_id, topic_id: topic_id || null, title, description, file_url, file_type, file_size, uploaded_by })
+      .insert({ subject_id, topic_id: topic_id || null, title, description, file_url, file_type, file_size, uploaded_by, category, tags })
       .select()
       .single();
     if (error) throw error;
@@ -25,6 +25,16 @@ const Material = {
       .from('materials')
       .select('*, subject:subjects(id,name,code), topic:topics(id,name), uploader:users!materials_uploaded_by_fkey(name)')
       .eq('subject_id', subjectId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async findByUploader(userId) {
+    const { data, error } = await supabase
+      .from('materials')
+      .select('*, subject:subjects(id,name,code)')
+      .eq('uploaded_by', userId)
       .order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];

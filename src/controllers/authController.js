@@ -6,13 +6,13 @@ exports.getRegister = (req, res) => {
 };
 
 exports.postRegister = async (req, res) => {
-  const { name, email, password, confirmPassword, invitationCode } = req.body;
+  const { full_name, username, student_code, email, password, confirm_password, invitation_code } = req.body;
   try {
-    if (!name || !email || !password || !invitationCode) {
+    if (!full_name || !email || !password || !invitation_code || !username) {
       req.flash('error', 'All fields including invitation code are required.');
       return res.redirect('/register');
     }
-    if (password !== confirmPassword) {
+    if (password !== confirm_password) {
       req.flash('error', 'Passwords do not match.');
       return res.redirect('/register');
     }
@@ -27,7 +27,13 @@ exports.postRegister = async (req, res) => {
       return res.redirect('/register');
     }
 
-    const code = await InvitationCode.findByCode(invitationCode);
+    const existingUsername = await User.findByUsername(username);
+    if (existingUsername) {
+      req.flash('error', 'This username is already taken.');
+      return res.redirect('/register');
+    }
+
+    const code = await InvitationCode.findByCode(invitation_code);
     if (!code) {
       req.flash('error', 'Invalid invitation code.');
       return res.redirect('/register');
@@ -37,8 +43,8 @@ exports.postRegister = async (req, res) => {
       return res.redirect('/register');
     }
 
-    const user = await User.create({ name, email, password, role: 'student' });
-    await InvitationCode.markUsed(invitationCode, user.id);
+    const user = await User.create({ name: full_name, email, password, role: 'student', username, student_code });
+    await InvitationCode.markUsed(invitation_code, user.id);
 
     req.session.user = user;
     req.flash('success', `Welcome to La Kazarma, ${user.name}!`);
@@ -55,22 +61,22 @@ exports.getLogin = (req, res) => {
 };
 
 exports.postLogin = async (req, res) => {
-  const { email, password } = req.body;
+  const { identifier, password } = req.body;
   try {
-    if (!email || !password) {
-      req.flash('error', 'Email and password are required.');
+    if (!identifier || !password) {
+      req.flash('error', 'Username/email and password are required.');
       return res.redirect('/login');
     }
 
-    const user = await User.findByEmail(email);
+    const user = await User.findByIdentifier(identifier);
     if (!user) {
-      req.flash('error', 'Invalid email or password.');
+      req.flash('error', 'Invalid username/email or password.');
       return res.redirect('/login');
     }
 
     const valid = await User.verifyPassword(password, user.password_hash);
     if (!valid) {
-      req.flash('error', 'Invalid email or password.');
+      req.flash('error', 'Invalid username/email or password.');
       return res.redirect('/login');
     }
 
@@ -79,6 +85,8 @@ exports.postLogin = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      username: user.username,
+      student_code: user.student_code,
       avatar_url: user.avatar_url,
     };
     req.session.user = safeUser;
@@ -105,8 +113,6 @@ exports.getForgotPassword = (req, res) => {
 exports.postForgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
-    const user = await User.findByEmail(email);
-    // Don't reveal whether email exists
     req.flash('success', 'If an account exists for that email, a reset link has been sent.');
     res.redirect('/login');
   } catch (err) {

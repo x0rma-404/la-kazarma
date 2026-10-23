@@ -73,7 +73,7 @@ exports.postUpload = async (req, res, next) => {
         req.flash('error', 'Please select a file to upload.');
         return res.redirect('/materials/upload');
       }
-      const { subject_id, topic_id, title, description } = req.body;
+      const { subject_id, topic_id, title, description, category, tags } = req.body;
       const fileUrl = '/uploads/' + req.file.filename;
       const fileType = path.extname(req.file.originalname).slice(1).toLowerCase();
 
@@ -86,6 +86,8 @@ exports.postUpload = async (req, res, next) => {
         file_type: fileType,
         file_size: req.file.size,
         uploaded_by: req.session.user.id,
+        category,
+        tags,
       });
 
       req.flash('success', 'Material uploaded successfully.');
@@ -95,6 +97,53 @@ exports.postUpload = async (req, res, next) => {
       res.redirect('/materials/upload');
     }
   });
+};
+
+exports.download = async (req, res, next) => {
+  try {
+    const material = await Material.findById(req.params.id);
+    if (!material || !material.file_url) {
+      req.flash('error', 'File not found.');
+      return res.redirect('/materials');
+    }
+    const filePath = path.join(__dirname, '..', '..', material.file_url);
+    if (!fs.existsSync(filePath)) {
+      req.flash('error', 'File not found on disk.');
+      return res.redirect('/materials');
+    }
+    res.download(filePath, material.title + '.' + (material.file_type || 'txt'));
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.preview = async (req, res, next) => {
+  try {
+    const material = await Material.findById(req.params.id);
+    if (!material || !material.file_url) {
+      req.flash('error', 'File not found.');
+      return res.redirect('/materials');
+    }
+    const filePath = path.join(__dirname, '..', '..', material.file_url);
+    if (!fs.existsSync(filePath)) {
+      req.flash('error', 'File not found on disk.');
+      return res.redirect('/materials');
+    }
+    res.sendFile(path.resolve(filePath));
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.bookmark = async (req, res, next) => {
+  try {
+    await Bookmark.create({ user_id: req.session.user.id, material_id: req.params.id });
+    res.redirect('back');
+  } catch (err) {
+    // Maybe already bookmarked
+    try { await Bookmark.deleteByUserAndMaterial(req.session.user.id, req.params.id); } catch(e) {}
+    res.redirect('back');
+  }
 };
 
 exports.delete = async (req, res, next) => {

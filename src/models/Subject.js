@@ -1,10 +1,10 @@
 const supabase = require('../config/database');
 
 const Subject = {
-  async create({ name, code, description, semester }) {
+  async create({ name, code, description, semester, academic_year }) {
     const { data, error } = await supabase
       .from('subjects')
-      .insert({ name, code, description, semester })
+      .insert({ name, code, description, semester, academic_year })
       .select()
       .single();
     if (error) throw error;
@@ -31,16 +31,26 @@ const Subject = {
   },
 
   async findByIdWithDetails(id) {
-    const { data, error } = await supabase
+    const { data: subject, error: sErr } = await supabase
       .from('subjects')
-      .select('*, topics:topics(*)')
+      .select('*')
       .eq('id', id)
       .maybeSingle();
-    if (error) throw error;
-    if (data && data.topics) {
-      data.topics.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
-    }
-    return data;
+    if (sErr) throw sErr;
+    if (!subject) return null;
+    const { data: topics } = await supabase
+      .from('topics')
+      .select('*')
+      .eq('subject_id', id)
+      .order('sort_order', { ascending: true });
+    subject.topics = topics || [];
+    const { data: announcements } = await supabase
+      .from('announcements')
+      .select('*, created_by_user:users!announcements_created_by_fkey(name)')
+      .eq('subject_id', id)
+      .order('created_at', { ascending: false });
+    subject.announcements = announcements || [];
+    return subject;
   },
 
   async update(id, updates) {
@@ -49,6 +59,7 @@ const Subject = {
     if (updates.code !== undefined) allowed.code = updates.code;
     if (updates.description !== undefined) allowed.description = updates.description;
     if (updates.semester !== undefined) allowed.semester = updates.semester;
+    if (updates.academic_year !== undefined) allowed.academic_year = updates.academic_year;
     const { data, error } = await supabase
       .from('subjects')
       .update(allowed)

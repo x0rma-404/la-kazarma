@@ -1,10 +1,10 @@
 const supabase = require('../config/database');
 
 const Assignment = {
-  async create({ subject_id, title, description, due_date, max_score = 100, created_by }) {
+  async create({ subject_id, title, description, due_date, max_score = 100, created_by, tags, file_url }) {
     const { data, error } = await supabase
       .from('assignments')
-      .insert({ subject_id, title, description, due_date, max_score, created_by })
+      .insert({ subject_id, title, description, due_date, max_score, created_by, tags, file_url })
       .select()
       .single();
     if (error) throw error;
@@ -43,7 +43,7 @@ const Assignment = {
   async findByIdWithSolutions(id) {
     const { data, error } = await supabase
       .from('assignments')
-      .select('*, subject:subjects(*), solutions:solutions(*, user:users!solutions_user_id_fkey(id,name))')
+      .select('*, subject:subjects(*), solutions:solutions(*, user:users!solutions_user_id_fkey(id,name,username,student_code))')
       .eq('id', id)
       .maybeSingle();
     if (error) throw error;

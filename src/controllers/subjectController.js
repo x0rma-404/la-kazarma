@@ -2,6 +2,7 @@ const Subject = require('../models/Subject');
 const Topic = require('../models/Topic');
 const Material = require('../models/Material');
 const Assignment = require('../models/Assignment');
+const Announcement = require('../models/Announcement');
 
 exports.index = async (req, res, next) => {
   try {
@@ -40,8 +41,8 @@ exports.show = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
   try {
-    const { name, code, description, semester } = req.body;
-    await Subject.create({ name, code, description, semester });
+    const { name, code, description, semester, academic_year } = req.body;
+    await Subject.create({ name, code, description, semester, academic_year });
     req.flash('success', 'Subject created successfully.');
     res.redirect('/subjects');
   } catch (err) {
@@ -52,8 +53,8 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    const { name, code, description, semester } = req.body;
-    await Subject.update(req.params.id, { name, code, description, semester });
+    const { name, code, description, semester, academic_year } = req.body;
+    await Subject.update(req.params.id, { name, code, description, semester, academic_year });
     req.flash('success', 'Subject updated successfully.');
     res.redirect('/subjects/' + req.params.id);
   } catch (err) {
@@ -75,8 +76,9 @@ exports.delete = async (req, res, next) => {
 
 exports.createTopic = async (req, res, next) => {
   try {
-    const { name, description } = req.body;
-    await Topic.create({ subject_id: req.params.id, name, description });
+    const { name, description, order_index } = req.body;
+    const sortOrder = order_index ? parseInt(order_index) : 0;
+    await Topic.create({ subject_id: req.params.id, name, description, sort_order: sortOrder });
     req.flash('success', 'Topic added successfully.');
     res.redirect('/subjects/' + req.params.id);
   } catch (err) {
@@ -92,6 +94,29 @@ exports.deleteTopic = async (req, res, next) => {
     res.redirect('/subjects/' + req.params.id);
   } catch (err) {
     req.flash('error', 'Failed to delete topic.');
+    res.redirect('/subjects/' + req.params.id);
+  }
+};
+
+exports.createAnnouncement = async (req, res, next) => {
+  try {
+    const { title, content } = req.body;
+    await Announcement.create({ subject_id: req.params.id, title, content, created_by: req.session.user.id });
+    req.flash('success', 'Announcement published.');
+    res.redirect('/subjects/' + req.params.id);
+  } catch (err) {
+    req.flash('error', 'Failed to publish announcement.');
+    res.redirect('/subjects/' + req.params.id);
+  }
+};
+
+exports.deleteAnnouncement = async (req, res, next) => {
+  try {
+    await Announcement.delete(req.params.announcementId);
+    req.flash('success', 'Announcement deleted.');
+    res.redirect('/subjects/' + req.params.id);
+  } catch (err) {
+    req.flash('error', 'Failed to delete announcement.');
     res.redirect('/subjects/' + req.params.id);
   }
 };

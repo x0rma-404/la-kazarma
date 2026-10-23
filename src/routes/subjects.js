@@ -10,5 +10,7 @@ router.post('/:id', auth.requireRole('admin'), subjectController.update);
 router.post('/:id/delete', auth.requireRole('admin'), subjectController.delete);
 router.post('/:id/topics', subjectController.createTopic);
 router.post('/:id/topics/:topicId/delete', subjectController.deleteTopic);
+router.post('/:id/announcements', auth.requireRole('admin'), subjectController.createAnnouncement);
+router.post('/:id/announcements/:announcementId/delete', auth.requireRole('admin'), subjectController.deleteAnnouncement);
 
 module.exports = router;

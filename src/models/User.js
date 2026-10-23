@@ -2,12 +2,12 @@ const supabase = require('../config/database');
 const bcrypt = require('bcryptjs');
 
 const User = {
-  async create({ name, email, password, role = 'student' }) {
+  async create({ name, email, password, role = 'student', username, student_code }) {
     const passwordHash = await bcrypt.hash(password, 10);
     const { data, error } = await supabase
       .from('users')
-      .insert({ name, email, password_hash: passwordHash, role })
-      .select('id, name, email, role, avatar_url, bio, created_at')
+      .insert({ name, email, password_hash: passwordHash, role, username, student_code })
+      .select('id, name, email, role, username, student_code, avatar_url, bio, created_at')
       .single();
     if (error) throw error;
     return data;
@@ -23,10 +23,27 @@ const User = {
     return data;
   },
 
+  async findByUsername(username) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', username)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+
+  async findByIdentifier(identifier) {
+    // Try username first, then email
+    let user = await this.findByUsername(identifier);
+    if (!user) user = await this.findByEmail(identifier);
+    return user;
+  },
+
   async findById(id) {
     const { data, error } = await supabase
       .from('users')
-      .select('id, name, email, role, avatar_url, bio, created_at')
+      .select('id, name, email, role, username, student_code, avatar_url, bio, created_at')
       .eq('id', id)
       .maybeSingle();
     if (error) throw error;
@@ -48,7 +65,7 @@ const User = {
       .from('users')
       .update(allowed)
       .eq('id', id)
-      .select('id, name, email, role, avatar_url, bio, created_at')
+      .select('id, name, email, role, username, student_code, avatar_url, bio, created_at')
       .single();
     if (error) throw error;
     return data;
@@ -67,7 +84,7 @@ const User = {
   async findAll() {
     const { data, error } = await supabase
       .from('users')
-      .select('id, name, email, role, avatar_url, bio, created_at')
+      .select('id, name, email, role, username, student_code, avatar_url, bio, created_at')
       .order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];

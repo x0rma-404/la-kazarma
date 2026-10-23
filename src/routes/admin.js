@@ -6,6 +6,7 @@ const Subject = require('../models/Subject');
 const Material = require('../models/Material');
 const Assignment = require('../models/Assignment');
 const Solution = require('../models/Solution');
+const Setting = require('../models/Setting');
 
 router.get('/', async (req, res, next) => {
   try {
@@ -39,9 +40,18 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+router.post('/invitation-codes', async (req, res, next) => {
+  try {
+    const code = await InvitationCode.create(req.session.user.id);
+    res.json({ code });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to generate invitation code.' });
+  }
+});
+
 router.post('/invitations', async (req, res, next) => {
   try {
-    await InvitationCode.create(req.session.user.id);
+    const code = await InvitationCode.create(req.session.user.id);
     req.flash('success', 'Invitation code generated.');
     res.redirect('/admin');
   } catch (err) {
@@ -73,6 +83,22 @@ router.post('/users/:id/role', async (req, res, next) => {
     res.redirect('/admin');
   } catch (err) {
     req.flash('error', 'Failed to update user role.');
+    res.redirect('/admin');
+  }
+});
+
+router.post('/settings', async (req, res, next) => {
+  try {
+    const keys = ['max_file_size_mb', 'allowed_file_types', 'allow_zip_uploads', 'content_moderation_enabled', 'siteName', 'siteDescription'];
+    for (const key of keys) {
+      if (req.body[key] !== undefined) {
+        await Setting.set(key, req.body[key]);
+      }
+    }
+    req.flash('success', 'Settings saved.');
+    res.redirect('/admin');
+  } catch (err) {
+    req.flash('error', 'Failed to save settings.');
     res.redirect('/admin');
   }
 });
