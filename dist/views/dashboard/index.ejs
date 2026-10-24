@@ -1,0 +1,155 @@
+<%- include('../partials/head') %>
+<%- include('../partials/mobile-nav') %>
+<div class="app-layout">
+  <%- include('../partials/sidebar') %>
+  <main class="main-content">
+    <%- include('../partials/flash') %>
+    <div class="page-header">
+      <h1>Dashboard</h1>
+      <p class="page-subtitle">Welcome back, <%= user.name %></p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-teal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value"><%= stats.subjects %></span>
+          <span class="stat-label">Subjects</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-blue">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value"><%= stats.uploads %></span>
+          <span class="stat-label">Your Uploads</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-amber">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value"><%= stats.assignments %></span>
+          <span class="stat-label">Assignments</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-rose">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value"><%= stats.bookmarks %></span>
+          <span class="stat-label">Bookmarks</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2>Your Uploads</h2>
+          <a href="/materials" class="card-link">View all</a>
+        </div>
+        <div class="card-body">
+          <% if (!myUploads || myUploads.length === 0) { %>
+            <p class="empty-state">You haven't uploaded any materials yet.</p>
+          <% } else { %>
+            <div class="list-items">
+              <% myUploads.forEach(function(m) { %>
+                <a href="/materials/<%= m.id %>" class="list-item">
+                  <div class="list-item-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  </div>
+                  <div class="list-item-content">
+                    <strong><%= m.title %></strong>
+                    <span><%= m.subject ? m.subject.name : '' %></span>
+                  </div>
+                </a>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Upcoming Assignments</h2>
+          <a href="/assignments" class="card-link">View all</a>
+        </div>
+        <div class="card-body">
+          <% if (upcomingAssignments.length === 0) { %>
+            <p class="empty-state">No upcoming assignments.</p>
+          <% } else { %>
+            <div class="list-items">
+              <% upcomingAssignments.forEach(function(a) { %>
+                <a href="/assignments/<%= a.id %>" class="list-item">
+                  <div class="list-item-icon list-item-icon-amber">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                  </div>
+                  <div class="list-item-content">
+                    <strong><%= a.title %></strong>
+                    <span>Due: <%= a.due_date ? new Date(a.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'No deadline' %></span>
+                  </div>
+                </a>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Your Subjects</h2>
+          <a href="/subjects" class="card-link">View all</a>
+        </div>
+        <div class="card-body">
+          <% if (subjects.length === 0) { %>
+            <p class="empty-state">No subjects yet.</p>
+          <% } else { %>
+            <div class="subjects-grid">
+              <% subjects.forEach(function(s) { %>
+                <a href="/subjects/<%= s.id %>" class="subject-chip">
+                  <strong><%= s.name %></strong>
+                  <% if (s.code) { %><span><%= s.code %></span><% } %>
+                </a>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>My Submissions</h2>
+          <a href="/assignments" class="card-link">View all</a>
+        </div>
+        <div class="card-body">
+          <% if (!mySolutions || mySolutions.length === 0) { %>
+            <p class="empty-state">You haven't submitted any solutions yet.</p>
+          <% } else { %>
+            <div class="list-items">
+              <% mySolutions.forEach(function(s) { %>
+                <a href="/assignments/<%= s.assignment ? s.assignment.id : '' %>" class="list-item">
+                  <div class="list-item-icon <%= s.score !== null && s.score !== undefined ? 'list-item-icon-green' : 'list-item-icon-blue' %>">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                  </div>
+                  <div class="list-item-content">
+                    <strong><%= s.assignment ? s.assignment.title : '' %></strong>
+                    <span><%= s.score !== null && s.score !== undefined ? 'Scored: ' + s.score + '/' + (s.assignment ? (s.assignment.max_score || 100) : 100) : 'Pending review' %></span>
+                  </div>
+                </a>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/js/sidebar.js"></script>
+</body>
+</html>

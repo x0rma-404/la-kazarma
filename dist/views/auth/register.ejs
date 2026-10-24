@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - La Kazarma</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none">
+          <rect x="2" y="2" width="60" height="60" rx="14" fill="#1c1f17" stroke="#6b7c3e" stroke-width="2.5"/>
+          <rect x="5" y="5" width="54" height="54" rx="11" fill="none" stroke="#252a1d" stroke-width="1.5"/>
+          <g transform="rotate(45 32 32)">
+            <path d="M32 6 L34.5 12 L33.5 40 L30.5 40 L29.5 12 Z" fill="#d6dad0" stroke="#52584a" stroke-width="0.5"/>
+            <line x1="32" y1="10" x2="32" y2="38" stroke="#7a8270" stroke-width="0.8"/>
+            <rect x="24" y="40" width="16" height="3.5" rx="1.5" fill="#a4b868" stroke="#3f4924" stroke-width="0.5"/>
+            <rect x="30.2" y="43.5" width="3.6" height="10" rx="1" fill="#1b1d18" stroke="#4a523c" stroke-width="0.6"/>
+            <circle cx="32" cy="55.5" r="2.8" fill="#a4b868" stroke="#3f4924" stroke-width="0.6"/>
+          </g>
+          <g transform="rotate(-45 32 32)">
+            <path d="M32 6 L34.5 12 L33.5 40 L30.5 40 L29.5 12 Z" fill="#d6dad0" stroke="#52584a" stroke-width="0.5"/>
+            <line x1="32" y1="10" x2="32" y2="38" stroke="#7a8270" stroke-width="0.8"/>
+            <rect x="24" y="40" width="16" height="3.5" rx="1.5" fill="#a4b868" stroke="#3f4924" stroke-width="0.5"/>
+            <rect x="30.2" y="43.5" width="3.6" height="10" rx="1" fill="#1b1d18" stroke="#4a523c" stroke-width="0.6"/>
+            <circle cx="32" cy="55.5" r="2.8" fill="#a4b868" stroke="#3f4924" stroke-width="0.6"/>
+          </g>
+          <circle cx="32" cy="32" r="4.2" fill="#141710" stroke="#a4b868" stroke-width="1.5"/>
+          <circle cx="32" cy="32" r="1.8" fill="#a4b868"/>
+        </svg>
+        <h1>Join La Kazarma</h1>
+        <p>You need an invitation code to register</p>
+      </div>
+
+      <% if (success && success.length > 0) { %>
+        <div class="flash flash-success">
+          <% success.forEach(function(msg) { %><span><%= msg %></span><% }) %>
+        </div>
+      <% } %>
+      <% if (error && error.length > 0) { %>
+        <div class="flash flash-error">
+          <% error.forEach(function(msg) { %><span><%= msg %></span><% }) %>
+        </div>
+      <% } %>
+
+      <form action="/register" method="POST" class="auth-form">
+        <div class="form-group">
+          <label for="full_name">Full Name</label>
+          <input type="text" id="full_name" name="full_name" placeholder="Your full name" required autofocus>
+        </div>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Choose a username" required>
+        </div>
+        <div class="form-group">
+          <label for="student_code">Student Code</label>
+          <input type="text" id="student_code" name="student_code" placeholder="e.g. BHOS-CE-042">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="At least 6 characters" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label for="confirm_password">Confirm Password</label>
+          <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat your password" required>
+        </div>
+        <div class="form-group">
+          <label for="invitation_code">Invitation Code</label>
+          <input type="text" id="invitation_code" name="invitation_code" placeholder="Enter your invitation code" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Already have an account? <a href="/login">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

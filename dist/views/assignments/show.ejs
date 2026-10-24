@@ -1,0 +1,125 @@
+<%- include('../partials/head') %>
+<%- include('../partials/mobile-nav') %>
+<div class="app-layout">
+  <%- include('../partials/sidebar') %>
+  <main class="main-content">
+    <%- include('../partials/flash') %>
+    <div class="page-header">
+      <div>
+        <h1><%= assignment.title %></h1>
+        <p class="page-subtitle">
+          <a href="/subjects/<%= assignment.subject ? assignment.subject.id : '' %>"><%= assignment.subject ? assignment.subject.name : '' %></a>
+          <% if (assignment.due_date) { %>
+            - Due: <%= new Date(assignment.due_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+          <% } %>
+        </p>
+      </div>
+      <% if (user.role === 'admin') { %>
+        <form action="/assignments/<%= assignment.id %>/delete" method="POST" onsubmit="return confirm('Delete this assignment?')">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      <% } %>
+    </div>
+
+    <% if (assignment.description) { %>
+      <div class="card">
+        <div class="card-body">
+          <p><%= assignment.description %></p>
+          <div class="assignment-meta">
+            <span>Max score: <strong><%= assignment.max_score || 100 %></strong></span>
+            <% if (assignment.tags) { %><span>Tags: <strong><%= assignment.tags %></strong></span><% } %>
+          </div>
+          <% if (assignment.file_url) { %>
+            <div class="material-actions" style="margin-top:12px">
+              <a href="<%= assignment.file_url %>" download class="btn btn-secondary">Download Specification</a>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Submit Your Solution</h2>
+      </div>
+      <div class="card-body">
+        <% if (mySolution) { %>
+          <div class="solution-status">
+            <div class="solution-status-icon solution-status-icon-green">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>Solution Submitted</strong>
+              <p>Submitted on <%= new Date(mySolution.submitted_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></p>
+              <% if (mySolution.title) { %><p><strong><%= mySolution.title %></strong></p><% } %>
+              <% if (mySolution.notes) { %><p><%= mySolution.notes %></p><% } %>
+              <% if (mySolution.file_url) { %>
+                <p><a href="/assignments/solutions/<%= mySolution.id %>/download" class="btn btn-secondary btn-sm">Download your submission</a></p>
+              <% } %>
+              <% if (mySolution.score !== null && mySolution.score !== undefined) { %>
+                <div class="solution-grade">
+                  <span class="grade-score">Score: <%= mySolution.score %>/<%= assignment.max_score || 100 %></span>
+                  <% if (mySolution.feedback) { %><p><strong>Feedback:</strong> <%= mySolution.feedback %></p><% } %>
+                </div>
+              <% } else { %>
+                <span class="badge badge-amber">Pending review</span>
+              <% } %>
+            </div>
+          </div>
+        <% } else { %>
+          <form action="/assignments/<%= assignment.id %>/solutions" method="POST" enctype="multipart/form-data" class="auth-form">
+            <div class="form-group">
+              <label for="title">Solution Title</label>
+              <input type="text" id="title" name="title" placeholder="Give your solution a title">
+            </div>
+            <div class="form-group">
+              <label for="notes">Notes</label>
+              <textarea id="notes" name="notes" rows="4" placeholder="Describe your approach..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="file">Attach File</label>
+              <input type="file" id="file" name="file">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Solution</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+
+    <% if (isAdmin && assignment.solutions && assignment.solutions.length > 0) { %>
+      <div class="card">
+        <div class="card-header">
+          <h2>Student Submissions (<%= assignment.solutions.length %>)</h2>
+        </div>
+        <div class="card-body">
+          <% assignment.solutions.forEach(function(s) { %>
+            <div class="submission-row">
+              <div class="submission-info">
+                <strong><%= s.user ? s.user.name : 'Unknown' %></strong>
+                <span><%= new Date(s.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
+                <% if (s.title) { %><p><strong><%= s.title %></strong></p><% } %>
+                <% if (s.notes) { %><p><%= s.notes %></p><% } %>
+                <% if (s.file_url) { %><a href="/assignments/solutions/<%= s.id %>/download" class="btn btn-ghost btn-sm">Download file</a><% } %>
+              </div>
+              <div class="submission-grade">
+                <% if (s.score !== null && s.score !== undefined) { %>
+                  <span class="badge badge-green">Graded: <%= s.score %>/<%= assignment.max_score || 100 %></span>
+                <% } else { %>
+                  <form action="/assignments/<%= assignment.id %>/grade" method="POST" class="grade-form">
+                    <input type="hidden" name="solutionId" value="<%= s.id %>">
+                    <input type="number" name="score" placeholder="Score" min="0" max="<%= assignment.max_score || 100 %>" required>
+                    <input type="text" name="feedback" placeholder="Feedback (optional)">
+                    <button type="submit" class="btn btn-primary btn-sm">Grade</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    <% } %>
+  </main>
+</div>
+<script src="/js/sidebar.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - La Kazarma</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none">
+          <rect x="2" y="2" width="60" height="60" rx="14" fill="#1c1f17" stroke="#6b7c3e" stroke-width="2.5"/>
+          <rect x="5" y="5" width="54" height="54" rx="11" fill="none" stroke="#252a1d" stroke-width="1.5"/>
+          <g transform="rotate(45 32 32)">
+            <path d="M32 6 L34.5 12 L33.5 40 L30.5 40 L29.5 12 Z" fill="#d6dad0" stroke="#52584a" stroke-width="0.5"/>
+            <line x1="32" y1="10" x2="32" y2="38" stroke="#7a8270" stroke-width="0.8"/>
+            <rect x="24" y="40" width="16" height="3.5" rx="1.5" fill="#a4b868" stroke="#3f4924" stroke-width="0.5"/>
+            <rect x="30.2" y="43.5" width="3.6" height="10" rx="1" fill="#1b1d18" stroke="#4a523c" stroke-width="0.6"/>
+            <circle cx="32" cy="55.5" r="2.8" fill="#a4b868" stroke="#3f4924" stroke-width="0.6"/>
+          </g>
+          <g transform="rotate(-45 32 32)">
+            <path d="M32 6 L34.5 12 L33.5 40 L30.5 40 L29.5 12 Z" fill="#d6dad0" stroke="#52584a" stroke-width="0.5"/>
+            <line x1="32" y1="10" x2="32" y2="38" stroke="#7a8270" stroke-width="0.8"/>
+            <rect x="24" y="40" width="16" height="3.5" rx="1.5" fill="#a4b868" stroke="#3f4924" stroke-width="0.5"/>
+            <rect x="30.2" y="43.5" width="3.6" height="10" rx="1" fill="#1b1d18" stroke="#4a523c" stroke-width="0.6"/>
+            <circle cx="32" cy="55.5" r="2.8" fill="#a4b868" stroke="#3f4924" stroke-width="0.6"/>
+          </g>
+          <circle cx="32" cy="32" r="4.2" fill="#141710" stroke="#a4b868" stroke-width="1.5"/>
+          <circle cx="32" cy="32" r="1.8" fill="#a4b868"/>
+        </svg>
+        <h1>La Kazarma</h1>
+        <p>Private Academic Workspace - BHOS CE 25</p>
+      </div>
+
+      <% if (success && success.length > 0) { %>
+        <div class="flash flash-success">
+          <% success.forEach(function(msg) { %><span><%= msg %></span><% }) %>
+        </div>
+      <% } %>
+      <% if (error && error.length > 0) { %>
+        <div class="flash flash-error">
+          <% error.forEach(function(msg) { %><span><%= msg %></span><% }) %>
+        </div>
+      <% } %>
+
+      <form action="/login" method="POST" class="auth-form">
+        <div class="form-group">
+          <label for="identifier">Username or Email</label>
+          <input type="text" id="identifier" name="identifier" placeholder="Enter your username or email" required autofocus>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+      </form>
+
+      <div class="auth-footer">
+        <a href="/forgot-password">Forgot your password?</a>
+        <p>Need an account? <a href="/register">Sign up with invitation code</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

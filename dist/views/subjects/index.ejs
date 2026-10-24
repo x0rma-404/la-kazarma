@@ -1,0 +1,82 @@
+<%- include('../partials/head') %>
+<%- include('../partials/mobile-nav') %>
+<div class="app-layout">
+  <%- include('../partials/sidebar') %>
+  <main class="main-content">
+    <%- include('../partials/flash') %>
+    <div class="page-header">
+      <div>
+        <h1>Subjects</h1>
+        <p class="page-subtitle">Browse all your academic subjects</p>
+      </div>
+      <% if (user.role === 'admin') { %>
+        <button class="btn btn-primary" onclick="document.getElementById('addSubjectModal').style.display='flex'">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Subject
+        </button>
+      <% } %>
+    </div>
+
+    <% if (subjects.length === 0) { %>
+      <div class="empty-state-card">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <h3>No subjects yet</h3>
+        <p>Subjects will appear here once they are created.</p>
+      </div>
+    <% } else { %>
+      <div class="subjects-list">
+        <% subjects.forEach(function(s) { %>
+          <a href="/subjects/<%= s.id %>" class="subject-card">
+            <div class="subject-card-header">
+              <div class="subject-card-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </div>
+              <% if (s.code) { %><span class="subject-code"><%= s.code %></span><% } %>
+            </div>
+            <h3><%= s.name %></h3>
+            <% if (s.description) { %><p><%= s.description %></p><% } %>
+            <% if (s.semester) { %><span class="subject-semester">Semester <%= s.semester %></span><% } %>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <% if (user.role === 'admin') { %>
+      <div class="modal" id="addSubjectModal" style="display:none">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Add Subject</h2>
+            <button class="modal-close" onclick="document.getElementById('addSubjectModal').style.display='none'">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <form action="/subjects" method="POST" class="modal-form">
+            <div class="form-group">
+              <label>Name</label>
+              <input type="text" name="name" required placeholder="Subject name">
+            </div>
+            <div class="form-group">
+              <label>Code</label>
+              <input type="text" name="code" placeholder="e.g. CS101">
+            </div>
+            <div class="form-group">
+              <label>Semester</label>
+              <input type="text" name="semester" placeholder="e.g. 1">
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea name="description" rows="3" placeholder="Brief description"></textarea>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('addSubjectModal').style.display='none'">Cancel</button>
+              <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    <% } %>
+  </main>
+</div>
+<script src="/js/sidebar.js"></script>
+</body>
+</html>

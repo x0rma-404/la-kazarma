@@ -1,0 +1,74 @@
+<%- include('../partials/head') %>
+<%- include('../partials/mobile-nav') %>
+<div class="app-layout">
+  <%- include('../partials/sidebar') %>
+  <main class="main-content">
+    <%- include('../partials/flash') %>
+    <div class="page-header">
+      <div>
+        <h1><%= material.title %></h1>
+        <p class="page-subtitle">
+          <a href="/subjects/<%= material.subject ? material.subject.id : '' %>"><%= material.subject ? material.subject.name : '' %></a>
+          <% if (material.topic) { %> - <%= material.topic.name %><% } %>
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <% if (material.description) { %>
+          <p class="material-description"><%= material.description %></p>
+        <% } %>
+
+        <div class="material-meta">
+          <div class="material-meta-item">
+            <span>File type</span>
+            <strong><%= material.file_type ? material.file_type.toUpperCase() : 'Unknown' %></strong>
+          </div>
+          <div class="material-meta-item">
+            <span>Uploaded by</span>
+            <strong><%= material.uploader ? material.uploader.name : 'Unknown' %></strong>
+          </div>
+          <div class="material-meta-item">
+            <span>Date</span>
+            <strong><%= new Date(material.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></strong>
+          </div>
+        </div>
+
+        <div class="material-actions">
+          <a href="<%= material.file_url %>" class="btn btn-primary" download>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </a>
+
+          <% if (isBookmarked) { %>
+            <form action="/bookmarks/<%= material.id %>/delete" method="POST" style="display:inline">
+              <input type="hidden" name="materialId" value="<%= material.id %>">
+              <button type="submit" class="btn btn-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                Remove Bookmark
+              </button>
+            </form>
+          <% } else { %>
+            <form action="/bookmarks" method="POST" style="display:inline">
+              <input type="hidden" name="materialId" value="<%= material.id %>">
+              <button type="submit" class="btn btn-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                Bookmark
+              </button>
+            </form>
+          <% } %>
+
+          <% if (user.role === 'admin' || (material.uploaded_by === user.id)) { %>
+            <form action="/materials/<%= material.id %>/delete" method="POST" onsubmit="return confirm('Delete this material?')" style="display:inline">
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/js/sidebar.js"></script>
+</body>
+</html>

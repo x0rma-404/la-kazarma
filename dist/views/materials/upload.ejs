@@ -1,0 +1,95 @@
+<%- include('../partials/head') %>
+<%- include('../partials/mobile-nav') %>
+<div class="app-layout">
+  <%- include('../partials/sidebar') %>
+  <main class="main-content">
+    <%- include('../partials/flash') %>
+    <div class="page-header">
+      <h1>Upload Material</h1>
+      <p class="page-subtitle">Share study materials with the group</p>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <form action="/materials/upload" method="POST" enctype="multipart/form-data" class="auth-form">
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" required placeholder="Material title">
+          </div>
+          <div class="form-group">
+            <label for="subject_id">Subject</label>
+            <select id="subject_id" name="subject_id" required onchange="updateTopics(this.value)">
+              <option value="">Select a subject</option>
+              <% subjects.forEach(function(s) { %>
+                <option value="<%= s.id %>" <%= subjectId === s.id ? 'selected' : '' %>><%= s.name %><% if (s.code) { %> (<%= s.code %>)<% } %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-group" id="topicGroup" style="display:none">
+            <label for="topic_id">Topic (optional)</label>
+            <select id="topic_id" name="topic_id">
+              <option value="">No specific topic</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="3" placeholder="Brief description of the material"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="file">File</label>
+            <div class="file-upload-zone" id="fileZone">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p>Click to select a file or drag and drop</p>
+              <span id="fileName">No file selected</span>
+              <input type="file" id="file" name="file" required style="display:none">
+            </div>
+          </div>
+          <div class="form-actions">
+            <a href="/materials" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Upload</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/js/sidebar.js"></script>
+<script>
+const topics = <% if (subjectId && topics.length > 0) { %><%- JSON.stringify(topics) %><% } else { %>{}<% } %>;
+const allSubjects = {
+  <% subjects.forEach(function(s) { %>
+    "<%= s.id %>": [],
+  <% }) %>
+};
+
+function updateTopics(subjectId) {
+  const topicGroup = document.getElementById('topicGroup');
+  const topicSelect = document.getElementById('topic_id');
+  if (!subjectId) {
+    topicGroup.style.display = 'none';
+    return;
+  }
+  topicGroup.style.display = 'block';
+  fetch('/subjects/' + subjectId).then(() => {});
+}
+
+const fileZone = document.getElementById('fileZone');
+const fileInput = document.getElementById('file');
+const fileName = document.getElementById('fileName');
+fileZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) fileName.textContent = fileInput.files[0].name;
+});
+fileZone.addEventListener('dragover', (e) => { e.preventDefault(); fileZone.classList.add('dragover'); });
+fileZone.addEventListener('dragleave', () => fileZone.classList.remove('dragover'));
+fileZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  fileZone.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) {
+    fileInput.files = e.dataTransfer.files;
+    fileName.textContent = e.dataTransfer.files[0].name;
+  }
+});
+</script>
+</body>
+</html>
