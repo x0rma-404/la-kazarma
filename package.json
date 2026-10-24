@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "test": "node test-e2e.js"
+    "test": "node test-e2e.js",
+    "build": "echo \"No build step required\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
